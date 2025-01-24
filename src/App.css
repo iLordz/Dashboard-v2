@@ -2,3 +2,59 @@
     width: 100%;
     height: 900px;
 }
+
+.perfil-usuario{
+    text-align: center;
+    color: black;
+}
+
+.navbar{
+    background-color: red !important;
+}
+
+/* Estilo personalizado para el menú desplegable */
+.mi-dropdown-menu {
+    background-color: #333; /* Fondo oscuro */
+    border-radius: 8px; /* Bordes redondeados */
+    padding: 5px 0; /* Espaciado en el contenedor */
+    min-width: 200px; /* Ancho mínimo */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra suave */
+}
+
+/* Estilo para los elementos del menú */
+.mi-dropdown-menu .dropdown-item {
+    color: #ddd; /* Color de texto gris claro */
+    padding: 12px 16px; /* Relleno personalizado */
+    font-size: 1rem; /* Tamaño de fuente */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Efecto suave al pasar el cursor */
+}
+
+/* Efecto cuando pasas el cursor sobre un elemento */
+.mi-dropdown-menu .dropdown-item:hover {
+    background-color: #555; /* Fondo más oscuro */
+    color: #fff; /* Color blanco al pasar el cursor */
+}
+
+/* Estilo para los iconos dentro del menú */
+.mi-dropdown-item-icon {
+    margin-right: 10px; /* Espacio a la derecha de los iconos */
+    font-size: 1.2rem; /* Tamaño de los iconos */
+}
+
+/* Añadir un separador entre las opciones */
+.mi-dropdown-menu .dropdown-divider {
+    background-color: #444; /* Color del separador */
+}
+
+
+hr {
+    border: none;
+    border-top: 1px solid #ccc; /* Línea fina y gris */
+    margin: 20px 0; /* Espaciado de 20px arriba y abajo */
+    opacity: 0.5; /* Hacer la línea más sutil */
+}
+
+/* Si quieres agregar un estilo cuando el hr es muy visible en un área importante */
+.text hr {
+    border-top: 2px solid #8e8e8e; /* Azul más intenso para resaltar */
+}

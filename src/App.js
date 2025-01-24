@@ -4,7 +4,7 @@ import Home from './components/Home';
 import Login from './components/Login';
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Perfil from './components/Perfil'; // Importación correcta
+import Perfil from './components/Perfil';
 
 import appFirebase from './credenciales';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
@@ -23,11 +23,10 @@ function App() {
   });
 
   return (
-    <Router>
+    <Router basename="/app1">
       <Routes>
-        {/* Define las rutas */}
         <Route path="/" element={usuario ? <Home correoUsuario={usuario.email} /> : <Login />} />
-        <Route path="/perfil" element={<Perfil />} /> {/* Ruta para Perfil */}
+        <Route path="/perfil" element={<Perfil />} />
       </Routes>
     </Router>
   );
