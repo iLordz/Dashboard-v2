@@ -99,10 +99,10 @@ const Importe = ({ usuario }) => {
         }
     };
 
-    const handleTestModal = () => {
-        setLoading(true);
-        setTimeout(() => setLoading(false), 3000);
-    };
+    // const handleTestModal = () => {
+    //     setLoading(true);
+    //     setTimeout(() => setLoading(false), 3000);
+    // };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -197,7 +197,7 @@ const Importe = ({ usuario }) => {
     return (
         <div>
             <Navbar usuario={usuario} handleLogout={handleLogout} />
-            <button onClick={handleTestModal} className="test-btn">Probar Modal</button>
+            {/* <button onClick={handleTestModal} className="test-btn">Probar Modal</button> */}
             {loading && (
                 <div className="modal">
                     <div className="modal-content">
