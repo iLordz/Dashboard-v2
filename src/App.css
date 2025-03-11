@@ -1,60 +1,466 @@
-.tamaño-imagen{
+@import "~@fortawesome/fontawesome-free/css/all.min.css";
+
+
+.tamaño-imagen {
     width: 100%;
     height: 900px;
 }
 
-.perfil-usuario{
+.perfil-usuario {
     text-align: center;
     color: black;
 }
 
-.navbar{
-    background-color: red !important;
+/* Carrusel imagenes */
+.carousel-img {
+    display: block;
+    width: 100%;
+    height: 20%;
+    object-fit: cover;
 }
 
-/* Estilo personalizado para el menú desplegable */
+/* Estilo del encabezado*/
+.navbar {
+    background-color: #003ba7 !important;
+    color: white;
+}
+
+.icon {
+    height: 50px;
+}
+
+.nav-link {
+    color: white;
+}
+
 .mi-dropdown-menu {
-    background-color: #333; /* Fondo oscuro */
-    border-radius: 8px; /* Bordes redondeados */
-    padding: 5px 0; /* Espaciado en el contenedor */
-    min-width: 200px; /* Ancho mínimo */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra suave */
+    background-color: #333;
+    border-radius: 8px;
+    padding: 5px 0;
+    min-width: 200px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* Estilo para los elementos del menú */
 .mi-dropdown-menu .dropdown-item {
-    color: #ddd; /* Color de texto gris claro */
-    padding: 12px 16px; /* Relleno personalizado */
-    font-size: 1rem; /* Tamaño de fuente */
-    transition: background-color 0.3s ease, color 0.3s ease; /* Efecto suave al pasar el cursor */
+    color: #ddd;
+    padding: 12px 16px;
+    font-size: 1rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Efecto cuando pasas el cursor sobre un elemento */
 .mi-dropdown-menu .dropdown-item:hover {
-    background-color: #555; /* Fondo más oscuro */
-    color: #fff; /* Color blanco al pasar el cursor */
+    background-color: #555;
+    color: #fff;
 }
 
-/* Estilo para los iconos dentro del menú */
 .mi-dropdown-item-icon {
-    margin-right: 10px; /* Espacio a la derecha de los iconos */
-    font-size: 1.2rem; /* Tamaño de los iconos */
+    margin-right: 10px;
+    font-size: 1.2rem;
 }
 
-/* Añadir un separador entre las opciones */
 .mi-dropdown-menu .dropdown-divider {
-    background-color: #444; /* Color del separador */
+    background-color: #444;
 }
 
 
 hr {
     border: none;
-    border-top: 1px solid #ccc; /* Línea fina y gris */
-    margin: 20px 0; /* Espaciado de 20px arriba y abajo */
-    opacity: 0.5; /* Hacer la línea más sutil */
+    border-top: 1px solid #b7b7b7;
+    margin: 5px 0;
+    opacity: 1;
 }
 
-/* Si quieres agregar un estilo cuando el hr es muy visible en un área importante */
 .text hr {
-    border-top: 2px solid #8e8e8e; /* Azul más intenso para resaltar */
+    border-top: 2px solid #000000;
+}
+
+.forms {
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.upload-area {
+    width: 100%;
+    max-width: 1200px;
+    padding: 40px;
+    border: 4px dashed #cccccc;
+    border-radius: 10px;
+    background-color: #f7f7f7;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin: 20px auto;
+    transition: all 0.3s ease;
+}
+
+.upload-area.dragging {
+    border-color: #38a169;
+    /* Verde */
+    background-color: #f0fdfa;
+    /* Fondo verde claro */
+}
+
+.upload-area .upload-text {
+    font-size: 18px;
+    color: #666666;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.upload-area input[type="file"] {
+    display: none;
+}
+
+.upload-area .upload-btn {
+    background-color: #38a169;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.upload-area .upload-btn:hover {
+    background-color: #2f855a;
+}
+
+.preview-image {
+    width: 100%;
+    height: 500px;
+}
+
+
+.alerta {
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.success {
+    background-color: #d4edda;
+    color: #155724;
+    border-left: 5px solid #28a745;
+}
+
+.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-left: 5px solid #dc3545;
+}
+
+.warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border-left: 5px solid #ffc107;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+
+.fechainicio,
+.fechafin {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-weight: bold;
+    font-size: 14px;
+    color: #444;
+}
+
+.fechainicio input,
+.fechafin input {
+    font-size: 16px;
+    background-color: #f9f9f9;
+    color: #333;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.fechainicio input:hover,
+.fechafin input:hover {
+    background-color: #fff;
+    border-color: #007bff;
+}
+
+.form-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* Dos columnas de igual tamaño */
+    gap: 20px;
+    /* Espacio entre los elementos */
+}
+
+.custom-input {
+    font-size: 15px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    outline: none;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+    transition: border-color 0.3s ease-in-out;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+select.custom-input option {
+    text-align: center;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+
+input[type="time"].custom-input,
+#id,
+#prioridad {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    background-color: #ffffff00;
+    height: 45px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+
+
+.react-datepicker__input-container input {
+    background-color: #f7f7f7 !important;
+    padding: 10px !important;
+    border-radius: 5px !important;
+}
+
+.react-datepicker__header {
+    background-color: #006aff !important;
+    color: white !important;
+}
+
+.react-datepicker__day:hover {
+    background-color: #ddd !important;
+    color: #000000;
+}
+
+.custom-input:focus {
+    border-color: #0062ff;
+}
+
+
+.custom-input::-webkit-calendar-picker-indicator {
+    filter: invert(50%);
+    cursor: pointer;
+}
+
+.custom-input::-webkit-datetime-edit {
+    color: #333;
+
+}
+
+
+.custom-input::-moz-placeholder {
+    color: #888;
+}
+
+
+/* Graphics */
+.graphs-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+.graph-group {
+    flex: 1 1 45%;
+    box-sizing: border-box;
+}
+
+.graph1 {
+    width: 100%;
+    max-width: 550px;
+    height: 300px;
+    margin: 0 auto;
+}
+
+.button-container {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    justify-content: left;
+}
+
+.time-input {
+    height: 50%;
+    font-size: 15px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+    transition: border-color 0.3s ease-in-out;
+    text-align: center;
+
+
+    gap: 5px;
+    font-size: 14px;
+    color: #444;
+}
+
+.time-input::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+.time-input:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+.time-input:focus {
+    border-color: #FF00FF;
+    box-shadow: 0 0 10px #FF00FF;
+}
+
+
+.filter-btn {
+    display: inline-block;
+    justify-content: flex-start;
+    position: relative;
+}
+ul {
+    list-style: none !important; /* Elimina los puntos */
+    padding-left: 0 !important; /* Evita el desplazamiento */
+    margin: 0 !important; /* Asegura que no haya márgenes extra */
+  }
+
+.btn-pass {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+}
+
+.filter-list {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    display: flex;
+    gap: 10px;
+    padding: 5px 5px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  }
+
+  .filter-list.open {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .filter-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+  }
+  
+  .filter-list li {
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background 0.2s;
+  }
+
+  .filter-list:hover,
+  .filter-list:active,
+  .filter-list:focus{
+    border-top-left-radius: 0;
+  }
+  
+  .preview-container {
+    position: relative;
+    display: inline-block;
+}
+
+.delete-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #cdcdcd;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    z-index: 10;
+    align-items: center;
+    justify-content: center;
+}
+.delete-btn:hover {
+    background: #ffffff;
+    color: white;
+}
+
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #00000080;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background-color: white;
+    padding: 10%;
+    border-radius: 20px;
+    text-align: center;
+}
+.spinner {
+    border: 10px solid #0000001a;
+    border-left-color: #007bff;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+}
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
