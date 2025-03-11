@@ -244,7 +244,7 @@ const Importe = ({ usuario }) => {
                         )}
                         <br />
                         <input type="file" id="imageUpload" onChange={handleImageChange} required />
-
+                        <br />
                         <div className="form-container">
                             <div className="form-group">
                                 <label className='fechainicio'>Fecha de inicio</label>
@@ -286,18 +286,13 @@ const Importe = ({ usuario }) => {
                             </div>
 
                             <div className="form-group">
-                                <label className="fechafin">Tamaño</label>
-                                <select className="custom-input" name="id" id="id" required>
-                                    <option value="" disabled>Selecciona el tamaño del archivo</option>
-                                    {devices.length > 0 ? (
-                                        devices.map((device) => (
-                                            <option key={device.id} value={device.id}>{device.nombre}</option>
-                                        ))
-                                    ) : (
-                                        <option value="" disabled>Cargando dispositivos...</option>
-                                    )}
+                                <label className="fechafin">Tamaño de la Imagen</label>
+                                <select className="custom-input" name="imageSize" id="imageSize" required>
+                                    <option value="" disabled>Selecciona el tamaño de la imagen</option>
+                                    <option value="original-centered">Centrada (Tamaño original)</option>
                                 </select>
                             </div>
+
                         </div>
                         <br />
 
