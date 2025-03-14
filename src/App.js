@@ -5,6 +5,7 @@ import Login from './components/Login';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Perfil from './components/Perfil';
 import Importe from './components/Importe';
+import Editar from './components/Editar';
 
 
 function App() {
@@ -21,7 +22,7 @@ function App() {
         console.log("Respuesta del backend:", data);
 
         if (data.success) {
-          setUsuario(data);  // Guarda todo el objeto recibido
+          setUsuario(data);  
         } else {
           setUsuario(null);
         }
@@ -40,6 +41,7 @@ function App() {
         <Route path="/" element={usuario ? <Home usuario={usuario} setUsuario={setUsuario} /> : <Login setUsuario={setUsuario} />} />
         <Route path="/MiPerfil" element={usuario ? <Perfil usuario={usuario} setUsuario={setUsuario} /> : <Login setUsuario={setUsuario} />} />
         <Route path="/Importar" element={usuario ? <Importe usuario={usuario} setUsuario={setUsuario} /> : <Login setUsuario={setUsuario} />} />
+        <Route path="/Editar" element={usuario ? <Editar usuario={usuario} setUsuario={setUsuario} /> : <Login setUsuario={setUsuario} />} />
       </Routes> 
     </Router>
   );

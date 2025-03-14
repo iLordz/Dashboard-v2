@@ -285,13 +285,13 @@ const Importe = ({ usuario }) => {
                                 <input className='custom-input' type="number" name="prioridad" id="prioridad" min="1" max="10" required />
                             </div>
 
-                            <div className="form-group">
+                            {/* <div className="form-group">
                                 <label className="fechafin">Tamaño de la Imagen</label>
                                 <select className="custom-input" name="imageSize" id="imageSize" required>
                                     <option value="" disabled>Selecciona el tamaño de la imagen</option>
                                     <option value="original-centered">Centrada (Tamaño original)</option>
                                 </select>
-                            </div>
+                            </div> */}
 
                         </div>
                         <br />
@@ -300,8 +300,9 @@ const Importe = ({ usuario }) => {
                     </form>
                 </div>
 
-                <div className='container'>
+                <div className="button-container">
                     <Link className="btn btn-primary" to='/'>Regresar</Link>
+                    <Link className="btn btn-primary" to='/Editar'>Editar</Link>
                 </div>
                 <br />
             </div>

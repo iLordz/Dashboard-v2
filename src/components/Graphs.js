@@ -3,6 +3,7 @@ import { Line, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, ArcElement, LinearScale, LineElement, PointElement, Title, Tooltip, Legend } from 'chart.js';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import datos from '../datos.json';
+// import datos2 from '../contacts_visitors.json';
 import { FaFilter } from "react-icons/fa";
 ChartJS.register(CategoryScale, ArcElement, LinearScale, LineElement, PointElement, Title, Tooltip, Legend, zoomPlugin);
 
@@ -19,6 +20,9 @@ const Graphs = () => {
   const maleCount = datos.filter((d) => d.Gender === "male").length;
   const femaleCount = datos.filter((d) => d.Gender === "female").length;
   const total = maleCount + femaleCount;
+
+  // Dispositivos
+
 
   const filteredData =
     genderFilter === "male"
@@ -89,7 +93,6 @@ const Graphs = () => {
     };
   }, []);
 
-
   const chartOptions = {
     plugins: {
       legend: {
@@ -98,7 +101,11 @@ const Graphs = () => {
           boxWidth: 0,
           boxHeight: 0,
           color: 'black'
-        }
+        },
+        font: {
+          family: "DM Sans",
+
+        },
       }
     }
   };
@@ -152,26 +159,24 @@ const Graphs = () => {
     <div>
       <div className="container">
         <div className="relative inline-block" ref={menuRef}>
-          <button
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-full shadow-sm hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300"
-            onClick={() => setIsOpen(!isOpen)}>
-            <FaFilter className="text-gray-600" />
-            Filtrar
-          </button>
-
-          {/* Menú desplegable sin espacio extra cuando está cerrado */}
-          <div
-            className={`absolute top-full left-0 mt-1 w-56 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden transition-all duration-200 ${isOpen ? "opacity-100 scale-100 visible pointer-events-auto" : "opacity-0 scale-95 invisible pointer-events-none"
-              }`}>
-            <ul className="py-2 list-none">
-              <li className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" onClick={() => { setView("duration"); setIsOpen(false); }}>Mostrar Duración</li>
-              <li className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" onClick={() => { setView("age"); setIsOpen(false); }}>Mostrar Edad</li>
-              <li className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" onClick={() => { setGenderFilter("male"); setIsOpen(false); }}>Mostrar Hombres</li>
-            </ul>
-          </div>
+          <button className="btn btn-secondary" onClick={() => setIsOpen(!isOpen)}><FaFilter className="text-gray-600" /> Filtrar</button>
+          {isOpen && (
+            <>
+              <div className="custom-dropdown">
+                <ul className="py-2 list-none">
+                  <li className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" onClick={() => setView('duration')}>Mostrar Duración</li>
+                  <li className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" onClick={() => setView('age')}>Mostrar Edad</li>
+                  <li className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" onClick={() => setGenderFilter('male')}>Mostrar Hombres
+                  </li>
+                </ul>
+              </div>
+              <br />
+              <br />
+            </>
+          )}
         </div>
-
       </div>
+
       <h1 className='container text-center'>Gráficas</h1>
       <div className="container graphs-container">
         <div className="graph-group">
@@ -193,6 +198,7 @@ const Graphs = () => {
             <button className="btn btn-secondary" onClick={() => setGenderFilter("all")}>Mostrar Ambos</button>
           </div>
         </div>
+        
       </div>
     </div>
   );
