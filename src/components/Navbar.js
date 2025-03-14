@@ -18,7 +18,9 @@ const Navbar = ({ usuario, handleLogout }) => {
                         <img src={Icon} className='icon' />
                     </Link>
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                        <span className="navbar-toggler-icon"></span>
+                        <span className="user-icon">
+                            <FontAwesomeIcon icon={faUser} />
+                        </span>
                     </button>
                     <div className="collapse navbar-collapse" id="navbarNavDropdown">
                         <ul className="navbar-nav ms-auto">

@@ -1,11 +1,13 @@
 @import "~@fortawesome/fontawesome-free/css/all.min.css";
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
-body{
+
+body {
     font-family: "DM Sans", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: weight;
-  font-style: normal;
+    font-optical-sizing: auto;
+    font-weight: weight;
+    font-style: normal;
 }
+
 .tamaño-imagen {
     width: 100%;
     height: 900px;
@@ -236,7 +238,8 @@ select.custom-input option {
 
 input[type="time"].custom-input,
 #id,
-#prioridad, #imageSize {
+#prioridad,
+#imageSize {
     padding: 10px;
     font-size: 16px;
     border-radius: 5px;
@@ -355,11 +358,15 @@ input[type="time"].custom-input,
     justify-content: flex-start;
     position: relative;
 }
+
 ul {
-    list-style: none !important; /* Elimina los puntos */
-    padding-left: 0 !important; /* Evita el desplazamiento */
-    margin: 0 !important; /* Asegura que no haya márgenes extra */
-  }
+    list-style: none !important;
+    /* Elimina los puntos */
+    padding-left: 0 !important;
+    /* Evita el desplazamiento */
+    margin: 0 !important;
+    /* Asegura que no haya márgenes extra */
+}
 
 .btn-pass {
     background: none;
@@ -384,34 +391,34 @@ ul {
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-  }
+}
 
-  .filter-list.open {
+.filter-list.open {
     opacity: 1;
     visibility: visible;
-  }
-  
-  .filter-list ul {
+}
+
+.filter-list ul {
     list-style: none;
     padding: 0;
     margin: 0;
     display: flex;
-  }
-  
-  .filter-list li {
+}
+
+.filter-list li {
     cursor: pointer;
     padding: 5px 10px;
     border-radius: 5px;
     transition: background 0.2s;
-  }
+}
 
-  .filter-list:hover,
-  .filter-list:active,
-  .filter-list:focus{
+.filter-list:hover,
+.filter-list:active,
+.filter-list:focus {
     border-top-left-radius: 0;
-  }
-  
-  .preview-container {
+}
+
+.preview-container {
     position: relative;
     display: inline-block;
 }
@@ -433,8 +440,9 @@ ul {
     align-items: center;
     justify-content: center;
 }
+
 .delete-btn:hover {
-    background: #ffffff;
+    background: #c0c0c0;
     color: white;
 }
 
@@ -450,12 +458,14 @@ ul {
     justify-content: center;
     align-items: center;
 }
+
 .modal-content {
     background-color: white;
     padding: 10%;
     border-radius: 20px;
     text-align: center;
 }
+
 .spinner {
     border: 10px solid #0000001a;
     border-left-color: #007bff;
@@ -465,6 +475,7 @@ ul {
     animation: spin 1s linear infinite;
     margin: 0 auto 15px;
 }
+
 @keyframes spin {
     to {
         transform: rotate(360deg);
@@ -480,32 +491,57 @@ img {
 }
 
 .custom-dropdown {
-    background-color: #6c757d; 
-   
+    background-color: #6c757d;
+
     border-radius: 0.5rem;
     box-shadow: 0 3px 2px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     transition: all 0.3s ease;
     font-size: 16px;
-  }
-  
-  .custom-dropdown ul {
+}
+
+.custom-dropdown ul {
     padding: 0.5rem 0;
     list-style: none;
-  }
-  
-  .custom-dropdown li {
+}
+
+.custom-dropdown li {
     padding: 0.5rem 1rem;
     color: white;
     cursor: pointer;
-  }
-  
-  .custom-dropdown li:hover {
-    background-color: #545a60; /* gray-100 */
-  }
-  
-  .custom-dropdown li:focus {
-    background-color: #e5e7eb; /* gray-200 */
+}
+
+.custom-dropdown li:hover {
+    background-color: #545a60;
+    /* gray-100 */
+}
+
+.custom-dropdown li:focus {
+    background-color: #e5e7eb;
     outline: none;
-  }
-  
+}
+
+.modal {
+    position: "fixed";
+    top: 0;
+    left: 0;
+    width: "100%";
+    height: "100%";
+    background-color: "rgba(0,0,0,0.7)";
+    display: "flex";
+    justify-content: "center";
+    align-items: "center";
+}
+
+.custom-navbar-toggler {
+    border: none; 
+    padding: 10px; 
+    border-radius: 5px; 
+    align-items: center;
+}
+
+
+.user-icon {
+    padding: 5px;
+    color: white; 
+}

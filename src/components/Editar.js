@@ -29,6 +29,7 @@ const Editar = ({ usuario }) => {
 
     const [imagenes, setImagenes] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [selectedMedia, setSelectedMedia] = useState(null);
 
     const getVideoThumbnail = (videoSrc) => {
         return new Promise((resolve, reject) => {
@@ -75,6 +76,7 @@ const Editar = ({ usuario }) => {
                 console.error('Error al obtener las imágenes:', error);
                 setLoading(false);
             });
+            
     }, []);
 
     return (
@@ -107,16 +109,18 @@ const Editar = ({ usuario }) => {
                                             <td>{imagen.media_id}</td>
                                             <td>
                                                 {imagen.src.endsWith('.mp4') ? (
-                                                    <video
-                                                        src={imagen.thumbnail}
+                                                    <img
+                                                        src="/icono-video.png" // Puedes poner un ícono de video
                                                         alt={`Vista previa de video ${imagen.media_id}`}
-                                                        style={{ width: '100px', height: 'auto', objectFit: 'cover' }}
+                                                        style={{ width: '50px', height: '50px', objectFit: 'cover', cursor: 'pointer' }}
+                                                        onClick={() => setSelectedMedia({ type: 'video', src: `https://api.jaison.mx/${imagen.src}` })}
                                                     />
                                                 ) : (
                                                     <img
                                                         src={`https://api.jaison.mx/${imagen.src}`}
                                                         alt={`Imagen ${imagen.media_id}`}
-                                                        style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                                                        style={{ width: '50px', height: '50px', objectFit: 'cover', cursor: 'pointer' }}
+                                                        onClick={() => setSelectedMedia({ type: 'image', src: `https://api.jaison.mx/${imagen.src}` })}
                                                     />
                                                 )}
                                             </td>
@@ -141,7 +145,22 @@ const Editar = ({ usuario }) => {
                 <div className="button-container">
                     <Link className="btn btn-primary" to='/Importar'>Regresar</Link>
                 </div>
+                <br />
             </div>
+
+            {selectedMedia && (
+                <div className="modal" onClick={() => setSelectedMedia(null)} 
+                >
+                    <div style={{ padding: "10px", borderRadius: "8px", position: "relative" }}>
+                        <button onClick={() => setSelectedMedia(null)} className="delete-btn">✖</button>
+                        {selectedMedia.type === "image" ? (
+                            <img src={selectedMedia.src} alt="Vista previa" style={{ maxWidth: "90vw", maxHeight: "90vh" }} />
+                        ) : (
+                            <video src={selectedMedia.src} controls style={{ maxWidth: "90vw", maxHeight: "90vh" }} />
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
