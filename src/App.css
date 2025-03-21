@@ -577,9 +577,9 @@ img {
 
 .img-thumbnail {
     padding: 0 !important;
-    background-color: var(--bs-body-bg);
-    border: var(--bs-border-width) solid var(--bs-border-color);
+    background: none !important;
+    border: none !important;
     border-radius: var(--bs-border-radius);
     max-width: 100%;
-    height: auto;
+    height: 50px;
 }

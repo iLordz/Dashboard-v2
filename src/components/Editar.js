@@ -247,13 +247,13 @@ const Editar = ({ usuario }) => {
                                 <tr>
                                     <th>ID</th>
                                     <th>Imagen/Video</th>
-                                    <th>Fecha Inicio</th>
-                                    <th>Fecha Fin</th>
-                                    <th>Hora Inicio</th>
-                                    <th>Hora Fin</th>
+                                    <th>Fecha de inicio</th>
+                                    <th>Fecha de finalización</th>
+                                    <th>Hora de inicio</th>
+                                    <th>Hora de finalización</th>
                                     <th>Prioridad</th>
-                                    <th>Escalado</th>
-                                    <th>Device Name</th>
+                                    <th>Tamaño</th>
+                                    <th>Dispositivo</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
