@@ -228,6 +228,19 @@ hr {
     width: 100%;
     box-sizing: border-box;
 }
+.custom-input2 {
+    font-size: 15px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    outline: none;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+    transition: border-color 0.3s ease-in-out;
+    
+    width: 100%;
+    box-sizing: border-box;
+}
 
 select.custom-input option {
     text-align: center;
@@ -235,10 +248,26 @@ select.custom-input option {
     padding-right: 0;
 }
 
+.mt-5 {
+    margin-top: 0rem !important; 
+}
 
 input[type="time"].custom-input,
 #id,
 #prioridad,
+#duracion,
+#escalado,
+#imageSize {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    background-color: #ffffff00;
+    height: 45px;
+}
+
+input[type="time"].custom-input2,
+#id2,
+#prioridad2,
 #imageSize {
     padding: 10px;
     font-size: 16px;
@@ -544,4 +573,13 @@ img {
 .user-icon {
     padding: 5px;
     color: white; 
+}
+
+.img-thumbnail {
+    padding: 0 !important;
+    background-color: var(--bs-body-bg);
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius);
+    max-width: 100%;
+    height: auto;
 }

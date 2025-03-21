@@ -47,6 +47,8 @@ const Importe = ({ usuario }) => {
     const [hora_fin, setHoraFin] = useState("");
     const [devices, setDevices] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [escalados, setEscalados] = useState([]);
+
 
 
     const handleImageChange = (event) => {
@@ -106,47 +108,53 @@ const Importe = ({ usuario }) => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-
-        if (!imagen || !fecha_inicio || !fecha_fin || !hora_inicio || !hora_fin || !document.getElementById("id").value || !document.getElementById("prioridad").value) {
-            mostrarAlerta("Por favor selecciona una imagen y completa todos los campos.", "error");
+    
+        const id = document.getElementById("id").value;
+        const prioridad = document.getElementById("prioridad").value;
+        const duracion = document.getElementById("duracion").value;
+        const escalado = document.getElementById("escalado").value;
+    
+        if (!imagen || !fecha_inicio || !fecha_fin || !hora_inicio || !hora_fin || !id || !prioridad || !duracion || !escalado) {
+            mostrarAlerta("Por favor completa todos los campos obligatorios.", "error");
             return;
         }
-
+    
         setLoading(true);
-        setTimeout(() => {
-            setLoading(false);
-        }, 3000);
-
+    
         const formData = new FormData();
         formData.append("imagen", imagen);
         formData.append("fecha_inicio", fecha_inicio.toISOString().split('T')[0]);
         formData.append("fecha_fin", fecha_fin.toISOString().split('T')[0]);
         formData.append("hora_inicio", hora_inicio);
         formData.append("hora_fin", hora_fin);
-        formData.append("id", document.getElementById("id").value);
-        formData.append("prioridad", document.getElementById("prioridad").value);
-
+        formData.append("id", id);
+        formData.append("prioridad", prioridad);
+        formData.append("duracion", duracion);
+        formData.append("escalado", escalado);
+    
         try {
             const response = await fetch("https://api.jaison.mx/raspi/api.php?action=subirimg", {
                 method: "POST",
                 body: formData,
             });
-
+    
             const responseText = await response.text();
             console.log("Respuesta del servidor:", responseText);
+    
             let data;
             try {
                 data = JSON.parse(responseText);
             } catch {
                 data = responseText;
             }
-
+    
             if (response.ok) {
                 mostrarAlerta("Archivo subido exitosamente.", "success");
             } else {
-                mostrarAlerta(`⚠️ Error en la subida: ${data?.message || responseText}`, "success");
+                mostrarAlerta(`⚠️ Error en la subida: ${data?.message || responseText}`, "error");
             }
-
+    
+            // Reset de los inputs después de enviar
             setImagen(null);
             setPreview(null);
             setFechaInicio("");
@@ -155,24 +163,18 @@ const Importe = ({ usuario }) => {
             setHoraFin("");
             document.getElementById("id").value = "";
             document.getElementById("prioridad").value = "";
-
+            document.getElementById("duracion").value = "";
+            document.getElementById("escalado").value = "";
+    
         } catch (error) {
-            mostrarAlerta("Subida de datos exitosamente.", "success");
-
-            setImagen(null);
-            setPreview(null);
-            setFechaInicio("");
-            setFechaFin("");
-            setHoraInicio("");
-            setHoraFin("");
-            document.getElementById("id").value = "";
-            document.getElementById("prioridad").value = "";
+            mostrarAlerta("Error de conexión. Intenta de nuevo.", "error");
         } finally {
             setLoading(false);
         }
     };
+    
 
-    useEffect(() => {
+    useEffect(() => { //Dispositivos
         const fetchDevices = async () => {
             try {
                 const response = await fetch("https://api.jaison.mx/raspi/api.php?action=obtenerdevices", {
@@ -192,7 +194,33 @@ const Importe = ({ usuario }) => {
         fetchDevices();
     }, []);
 
+    const descripciones = {
+        original: "Mantiene el tamaño original sin cambios.",
+        escalado: "Ampliándola la imagen al 100% en largo y ancho.",
+        fit: "Ajusta la imagen dentro del contenedor manteniendo su relación de aspecto, lo que puede generar bordes vacíos si las proporciones no coinciden.",
+        outfit: "Escala la imagen para que cubra completamente el contenedor, lo que puede implicar recortes si las proporciones no coinciden."
+    };
 
+    useEffect(() => { //Escalados
+        const fetchEscalados = async () => {
+            try {
+                const response = await fetch("https://api.jaison.mx/raspi/api.php?action=obtenerescalados");
+
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+                setEscalados(data);
+            } catch (error) {
+                console.error("Error al obtener los escalados:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchEscalados();
+    }, []);
 
     return (
         <div>
@@ -283,6 +311,31 @@ const Importe = ({ usuario }) => {
                             <div className="form-group">
                                 <label htmlFor="prioridad" className='fechafin'>Prioridad</label>
                                 <input className='custom-input' type="number" name="prioridad" id="prioridad" min="1" max="10" required />
+                            </div>
+
+                            <div className="form-group">
+                                <label className="escalado-label">Elige un escalado</label>
+                                <select className="custom-input" name="escalado" id="escalado" required>
+                                    <option value="" disabled selected>Selecciona un escalado</option>
+                                    {loading ? (
+                                        <option value="" disabled>Cargando escalados...</option>
+                                    ) : (
+                                        escalados.length > 0 ? (
+                                            escalados.map((escalado, index) => (
+                                                <option key={index} value={escalado} title={descripciones[escalado] || "Sin descripción"}>
+                                                    {escalado}
+                                                </option>
+                                            ))
+                                        ) : (
+                                            <option value="" disabled>No hay escalados disponibles</option>
+                                        )
+                                    )}
+                                </select>
+                            </div>
+
+                            <div className="form-group">
+                                <label className='fechafin'>Duración (segundos) </label>
+                                <input className='custom-input' type="number" name="duracion" id="duracion" min="1" required />
                             </div>
 
                             {/* <div className="form-group">
