@@ -9,6 +9,28 @@ registerLocale('es', es);
 setDefaultLocale('es');
 
 const Editar = ({ usuario }) => {
+    // Estados principales
+    const [imagenes, setImagenes] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedMedia, setSelectedMedia] = useState(null);
+    const [editIndex, setEditIndex] = useState(null);
+    const [escalados, setEscalados] = useState([]);
+    const [nombre, setNombre] = useState([]);
+
+    // Estado para el formulario de edición
+    const [formData, setFormData] = useState({
+        rule_id: "",
+        fecha_inicio: "",
+        fecha_fin: "",
+        hora_inicio: "00:00:00",
+        hora_fin: "23:59:59",
+        escalado: "",
+        device: "",
+        x: "",
+        y: ""
+    });
+
+    // Manejador de logout
     const handleLogout = async () => {
         try {
             const response = await fetch("https://api.jaison.mx/Analisis_Perros/index.php?action=logout", {
@@ -19,88 +41,15 @@ const Editar = ({ usuario }) => {
                 }
             });
 
-            const data = await response.text();
-            console.log("Respuesta del servidor:", data);
-
             if (response.ok) {
                 localStorage.removeItem("token");
                 window.location.href = "/app1";
             } else {
-                console.error("Error al cerrar sesión:", data);
+                console.error("Error al cerrar sesión:", await response.text());
             }
         } catch (error) {
             console.error("Error de red:", error);
         }
-    };
-
-    const [imagenes, setImagenes] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [selectedMedia, setSelectedMedia] = useState(null);
-    const [editIndex, setEditIndex] = useState(null);
-    const [editedData, setEditedData] = useState({
-        rule_id: "",
-        fecha_inicio: "",
-        fecha_fin: "",
-        hora_inicio: "",
-        hora_fin: "",
-        escalado: "",
-        device: "",
-        x: "",
-        y: ""
-    });
-    const [fecha_inicio, setFechaInicio] = useState(null);
-    const [fecha_fin, setFechaFin] = useState(null);
-    const [hora_inicio, setHoraInicio] = useState("");
-    const [hora_fin, setHoraFin] = useState("");
-    const [escalados, setEscalados] = useState([]);
-    const [devices, setDevices] = useState([]);
-
-    // Manejadores de fechas/horas
-    const handleFechaInicioChange = (date) => {
-        setFechaInicio(date);
-        setEditedData(prev => ({
-            ...prev,
-            fecha_inicio: date.toISOString().split('T')[0]
-        }));
-    };
-
-    const handleFechaFinChange = (date) => {
-        setFechaFin(date);
-        setEditedData(prev => ({
-            ...prev,
-            fecha_fin: date.toISOString().split('T')[0]
-        }));
-    };
-
-    const handleHoraInicioChange = (e) => {
-        const value = e.target.value;
-        setHoraInicio(value);
-        setEditedData(prev => ({
-            ...prev,
-            hora_inicio: value
-        }));
-    };
-
-    const handleHoraFinChange = (e) => {
-        const value = e.target.value;
-        setHoraFin(value);
-        setEditedData(prev => ({
-            ...prev,
-            hora_fin: value
-        }));
-    };
-
-    // Manejador de cambios genérico
-    const handleChange = (field, value) => {
-        setEditedData(prev => ({
-            ...prev,
-            [field]: value
-        }));
-    };
-
-    // Manejador para seleccionar dispositivo
-    const handleDeviceChange = (e) => {
-        handleChange('device', e.target.value);
     };
 
     // Thumbnail para videos
@@ -123,7 +72,6 @@ const Editar = ({ usuario }) => {
     // Manejador para editar registro
     const handleEdit = async (index) => {
         const imagenSeleccionada = imagenes[index];
-        setEditIndex(index);
 
         // Cargar thumbnail si es video
         let mediaData = { ...imagenSeleccionada };
@@ -131,163 +79,159 @@ const Editar = ({ usuario }) => {
             mediaData.thumbnail = await getVideoThumbnail(imagenSeleccionada.src);
         }
 
-        // Actualizar todos los estados
-        setEditedData(mediaData);
-        setFechaInicio(new Date(mediaData.fecha_inicio));
-        setFechaFin(new Date(mediaData.fecha_fin));
-        setHoraInicio(mediaData.hora_inicio);
-        setHoraFin(mediaData.hora_fin);
+        // Actualizar estado del formulario
+        setFormData({
+            rule_id: mediaData.rule_id,
+            fecha_inicio: mediaData.fecha_inicio,
+            fecha_fin: mediaData.fecha_fin,
+            hora_inicio: mediaData.hora_inicio,
+            hora_fin: mediaData.hora_fin,
+            escalado: mediaData.escalado,
+            nombre: mediaData.nombre,
+            x: mediaData.x || "",
+            y: mediaData.y || ""
+        });
+
+        setEditIndex(index);
     };
 
     // Manejador para cancelar edición
-    const handleCancel = () => {
+    const handleCancelEdit = () => {
         setEditIndex(null);
-        setEditedData({
+        setFormData({
             rule_id: "",
             fecha_inicio: "",
             fecha_fin: "",
-            hora_inicio: "",
-            hora_fin: "",
+            hora_inicio: "00:00:00",
+            hora_fin: "23:59:59",
             escalado: "",
-            device: "",
+            nombre: "",
             x: "",
             y: ""
         });
     };
 
-    // Manejador para guardar cambios (Versión mejorada)
+    // Manejador para guardar cambios
     const handleSave = async () => {
         try {
-            // Validaciones básicas
-            if (editIndex === null || !editedData.rule_id) {
-                alert("Error: No hay elemento seleccionado para editar");
+            // 1. Validación básica
+            if (!formData.rule_id || !formData.fecha_inicio || !formData.fecha_fin) {
+                alert("Faltan campos obligatorios");
                 return;
             }
 
-            // Preparar datos para enviar
+            // 2. Preparar payload
             const payload = {
-                rule_id: editedData.rule_id,
-                fecha_inicio: fecha_inicio.toISOString().split('T')[0],
-                fecha_fin: fecha_fin.toISOString().split('T')[0],
-                hora_inicio: hora_inicio,
-                hora_fin: hora_fin,
-                escalado: editedData.escalado,
-                device: editedData.device,
-                x: editedData.x || null,
-                y: editedData.y || null
+                fecha_inicio: formData.fecha_inicio,
+                fecha_fin: formData.fecha_fin,
+                hora_inicio: formData.hora_inicio,
+                hora_fin: formData.hora_fin,
+                escalado: formData.escalado,
+                nombre: nombre.find(d => d.id === formData.nombre)?.nombre || "",
+                x: formData.x || null,
+                y: formData.y || null
             };
 
-            // Enviar a la API
+            // 3. Enviar a la API
             const response = await fetch(
-                `https://api.jaison.mx/raspi/api.php?action=editarimg&id=${editedData.rule_id}`,
+                `https://api.jaison.mx/raspi/api.php?action=editarimg&id=${formData.rule_id}`,
                 {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${localStorage.getItem("token")}`
                     },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(payload) // <- Solo los datos sin el ID
                 }
             );
 
-            const result = await response.json();
-
-            if (!response.ok || !result.success) {
-                throw new Error(result.error || "Error al guardar los cambios");
+            if (!response.ok) {
+                const errorData = await response.text(); // O response.json() si la API retorna JSON
+                throw new Error(errorData || "Error en la respuesta del servidor");
             }
 
-            // Actualizar estado local
-            const updatedImagenes = [...imagenes];
-            updatedImagenes[editIndex] = { ...updatedImagenes[editIndex], ...payload };
-            setImagenes(updatedImagenes);
-
-            // Resetear estados
-            handleCancel();
-            alert("Cambios guardados exitosamente!");
+            const result = await response.json();
+            console.log("Respuesta exitosa:", result);
+            alert("¡Cambios guardados!");
 
         } catch (error) {
-            console.error("Error en handleSave:", error);
+            console.error("Error completo:", {
+                message: error.message,
+                stack: error.stack,
+                data: formData // Para ver qué se intentó enviar
+            });
             alert(`Error al guardar: ${error.message}`);
         }
+
+        
     };
 
-    // Efectos para carga inicial
+    // Manejador genérico para cambios en el formulario
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    // Manejador para cambios en fechas
+    const handleDateChange = (date, field) => {
+        setFormData(prev => ({
+            ...prev,
+            [field]: date.toISOString().split('T')[0]
+        }));
+    };
+
+    // Efectos para carga inicial de datos
     useEffect(() => {
-        const fetchImages = () => {
-            fetch('https://api.jaison.mx/raspi/api.php?action=listarImagenes')
-                .then(response => response.json())
-                .then(async data => {
-                    if (data && Array.isArray(data.data)) {
-                        const updatedImagenes = await Promise.all(
-                            data.data.map(async (imagen) => {
-                                if (imagen.src.endsWith('.mp4')) {
-                                    const thumbnail = await getVideoThumbnail(imagen.src);
-                                    return { ...imagen, thumbnail };
-                                }
-                                return imagen;
-                            })
-                        );
-                        setImagenes(updatedImagenes);
-                    } else {
-                        setImagenes([]);
-                    }
-                    setLoading(false);
-                })
-                .catch(error => {
-                    console.error('Error al obtener las imágenes:', error);
-                    setLoading(false);
-                });
-        };
-
-        fetchImages(); // Llamar al inicio
-        const interval = setInterval(fetchImages, 5000); // Actualizar cada 5 segundos
-
-        return () => clearInterval(interval); // Limpiar al desmontar
-
-    }, []);
-
-
-
-    useEffect(() => { //Escalados
-        const fetchEscalados = async () => {
+        const fetchInitialData = async () => {
             try {
-                const response = await fetch("https://api.jaison.mx/raspi/api.php?action=obtenerescalados");
+                setLoading(true);
 
-                if (!response.ok) {
-                    throw new Error(`Error HTTP: ${response.status}`);
+                // Obtener imágenes
+                const imagesResponse = await fetch('https://api.jaison.mx/raspi/api.php?action=listarImagenes');
+                const imagesData = await imagesResponse.json();
+
+                if (imagesData && Array.isArray(imagesData.data)) {
+                    const imagesWithThumbnails = await Promise.all(
+                        imagesData.data.map(async img => {
+                            if (img.src.endsWith('.mp4')) {
+                                const thumbnail = await getVideoThumbnail(img.src);
+                                return { ...img, thumbnail };
+                            }
+                            return img;
+                        })
+                    );
+                    setImagenes(imagesWithThumbnails);
                 }
 
-                const data = await response.json();
-                setEscalados(data);
+                // Obtener escalados
+                const escaladosResponse = await fetch("https://api.jaison.mx/raspi/api.php?action=obtenerescalados");
+                const escaladosData = await escaladosResponse.json();
+                setEscalados(escaladosData);
+
+                // Obtener dispositivos
+                const nombresResponse = await fetch("https://api.jaison.mx/raspi/api.php?action=obtenerdevices", {
+                    mode: "cors",
+                });
+                const nombresData = await nombresResponse.json();
+                setNombre(nombresData);
+
             } catch (error) {
-                console.error("Error al obtener los escalados:", error);
+                console.error("Error al cargar datos iniciales:", error);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchEscalados();
-    }, []);
+        fetchInitialData(); // Solo se ejecuta una vez al montar el componente
 
-    useEffect(() => { //Dispositivos
-        const fetchDevices = async () => {
-            try {
-                const response = await fetch("https://api.jaison.mx/raspi/api.php?action=obtenerdevices", {
-                    mode: "cors",
-                });
+        // Eliminar estas líneas que establecían el intervalo:
+        // const interval = setInterval(fetchInitialData, 5000);
+        // return () => clearInterval(interval);
 
-                if (!response.ok) {
-                    throw new Error(`Error HTTP: ${response.status}`);
-                }
-
-                const data = await response.json();
-                setDevices(data);
-            } catch (error) {
-            }
-        };
-
-        fetchDevices();
-    }, []);
+    }, []); // Asegúrate de que el array de dependencias esté vacío
 
     return (
         <div>
@@ -329,13 +273,7 @@ const Editar = ({ usuario }) => {
                                                 type: imagen.src.endsWith('.mp4') ? 'video' : 'image'
                                             })}>
                                                 {imagen.src.endsWith('.mp4') ? (
-                                                    <video width='50' height='50' className='img-thumbnail' style={{ cursor: 'pointer' }}
-                                                        ref={(video) => {
-                                                            if (video) {
-                                                                video.currentTime = 1;
-                                                            }
-                                                        }}
-                                                    >
+                                                    <video width='50' height='50' className='img-thumbnail' style={{ cursor: 'pointer' }}>
                                                         <source src={`https://api.jaison.mx/${imagen.src}`} type='video/mp4' />
                                                     </video>
                                                 ) : (
@@ -351,71 +289,77 @@ const Editar = ({ usuario }) => {
                                                 <>
                                                     <td>
                                                         <DatePicker
-                                                            selected={fecha_inicio}
-                                                            onChange={handleFechaInicioChange}
+                                                            selected={formData.fecha_inicio ? new Date(formData.fecha_inicio) : null}
+                                                            onChange={(date) => handleDateChange(date, 'fecha_inicio')}
                                                             dateFormat='yyyy/MM/dd'
                                                             className='custom-input2'
                                                             locale='es'
-                                                            required
+                                                            
                                                         />
                                                     </td>
                                                     <td>
                                                         <DatePicker
-                                                            selected={fecha_fin}
-                                                            onChange={handleFechaFinChange}
+                                                            selected={formData.fecha_fin ? new Date(formData.fecha_fin) : null}
+                                                            onChange={(date) => handleDateChange(date, 'fecha_fin')}
                                                             dateFormat='yyyy/MM/dd'
                                                             className='custom-input2'
                                                             locale='es'
-                                                            required
-                                                            minDate={fecha_inicio}
+                                                            
+                                                            minDate={new Date(formData.fecha_inicio)}
                                                         />
                                                     </td>
                                                     <td>
                                                         <input
                                                             type='time'
                                                             className='custom-input2'
-                                                            value={hora_inicio}
-                                                            onChange={handleHoraInicioChange}
-                                                            required
+                                                            name="hora_inicio"
+                                                            value={formData.hora_inicio}
+                                                            onChange={handleInputChange}
+                                                            
+                                                            step="1"
                                                         />
                                                     </td>
                                                     <td>
                                                         <input
                                                             type='time'
                                                             className='custom-input2'
-                                                            value={hora_fin}
-                                                            onChange={handleHoraFinChange}
-                                                            min={hora_inicio}
-                                                            required
+                                                            name="hora_fin"
+                                                            value={formData.hora_fin}
+                                                            onChange={handleInputChange}
+                                                            min={formData.hora_inicio}
+                                                            
+                                                            step="1"
                                                         />
                                                     </td>
                                                     <td>
                                                         <input
                                                             type='number'
                                                             className='custom-input2'
-                                                            value={editedData.x || ""}
-                                                            onChange={(e) => handleChange("x", e.target.value)}
+                                                            name="x"
+                                                            value={formData.x}
+                                                            onChange={handleInputChange}
                                                         />
                                                     </td>
                                                     <td>
                                                         <input
                                                             type='number'
                                                             className='custom-input2'
-                                                            value={editedData.y || ""}
-                                                            onChange={(e) => handleChange("y", e.target.value)}
+                                                            name="y"
+                                                            value={formData.y}
+                                                            onChange={handleInputChange}
                                                         />
                                                     </td>
                                                     <td>
                                                         <select
-                                                            className="custom-input2"
+                                                            className='custom-input2'
                                                             name="escalado"
-                                                            id="escalado"
-                                                            value={editedData.escalado || ''}
-                                                            onChange={(e) => setEditedData({ ...editedData, escalado: e.target.value })}
-                                                            required
+                                                            value={formData.escalado}
+                                                            onChange={handleInputChange}
+                                                            
                                                         >
-                                                            {escalados.map((escalado, index) => (
-                                                                <option key={index} value={escalado}>
+                                                            <option value="">Seleccione...</option>
+                                                            {escalados.map((escalado, idx) => (
+                                                                <option key={idx} value={escalado}>
                                                                     {escalado}
                                                                 </option>
                                                             ))}
@@ -423,23 +367,27 @@ const Editar = ({ usuario }) => {
                                                     </td>
                                                     <td>
                                                         <select
-                                                            className="custom-input2"
-                                                            name="device"
-                                                            id="device"
-                                                            value={editedData.device || ''}
-                                                            onChange={handleDeviceChange}
-                                                            required
+                                                            className='custom-input2'
+                                                            name="nombre"
+                                                            value={formData.nombre}
+                                                            onChange={handleInputChange}
+                                                            
                                                         >
-                                                            {devices.length > 0 ? (
-                                                                devices.map((device) => (
-                                                                    <option key={device.id} value={device.id}>
-                                                                        {device.nombre}
-                                                                    </option>
-                                                                ))
-                                                            ) : (
-                                                                <option value='' disabled>Cargando dispositivos...</option>
-                                                            )}
+                                                            <option value="">Seleccione...</option>
+                                                            {nombre.map((nombre) => (
+                                                                <option key={nombre.id} value={nombre.id}>
+                                                                    {nombre.nombre}
+                                                                </option>
+                                                            ))}
                                                         </select>
+                                                    </td>
+                                                    <td>
+                                                        <button className='btn btn-success me-2' onClick={handleSave}>
+                                                            Guardar
+                                                        </button>
+                                                        <button className='btn btn-danger' onClick={handleCancelEdit}>
+                                                            Cancelar
+                                                        </button>
                                                     </td>
                                                 </>
                                             ) : (
@@ -452,26 +400,21 @@ const Editar = ({ usuario }) => {
                                                     <td>{imagen.y}</td>
                                                     <td>{imagen.escalado}</td>
                                                     <td>{imagen.device_name}</td>
+                                                    <td>
+                                                        <button
+                                                            onClick={() => handleEdit(index)}
+                                                            className='btn btn-secondary'
+                                                        >
+                                                            Editar
+                                                        </button>
+                                                    </td>
                                                 </>
                                             )}
-                                            <td>
-                                                {editIndex === index ? (
-                                                    <>
-                                                        <button className='btn btn-success' onClick={handleSave}>Guardar</button>
-                                                        <br />
-                                                        <button className='btn btn-danger' onClick={handleCancel}>Cancelar</button>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <button onClick={() => handleEdit(index)} className='btn btn-secondary'>Editar</button>
-                                                    </>
-                                                )}
-                                            </td>
                                         </tr>
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan='10' className='text-center'>No hay datos disponibles.</td>
+                                        <td colSpan='11' className='text-center'>No hay datos disponibles.</td>
                                     </tr>
                                 )}
                             </tbody>
@@ -481,24 +424,38 @@ const Editar = ({ usuario }) => {
 
                 <div className='d-flex justify-content-center mt-3'>
                     <Link className='btn btn-primary' to='/Importar'>Regresar</Link>
-
                 </div>
-                <br />
+
+                {/* Modal para vista previa de medios */}
                 {selectedMedia && (
                     <div className="modal" onClick={() => setSelectedMedia(null)}>
                         <div style={{ padding: "10px", borderRadius: "8px", position: "relative" }}>
-                            <button onClick={() => setSelectedMedia(null)} className="delete-btn">✖</button>
+                            <button
+                                onClick={() => setSelectedMedia(null)}
+                                className="btn btn-danger position-absolute top-0 end-0 m-2"
+                            >
+                                ✖
+                            </button>
                             {selectedMedia.type === "image" ? (
-                                <img src={selectedMedia.src} alt="Vista previa" style={{ maxWidth: "90vw", maxHeight: "90vh" }} />
+                                <img
+                                    src={selectedMedia.src}
+                                    alt="Vista previa"
+                                    style={{ maxWidth: "90vw", maxHeight: "90vh" }}
+                                />
                             ) : (
-                                <video src={selectedMedia.src} controls style={{ maxWidth: "90vw", maxHeight: "90vh" }} />
+                                <video
+                                    src={selectedMedia.src}
+                                    controls
+                                    style={{ maxWidth: "90vw", maxHeight: "90vh" }}
+                                    autoPlay
+                                />
                             )}
                         </div>
                     </div>
                 )}
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default Editar
+export default Editar;
