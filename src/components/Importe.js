@@ -82,7 +82,7 @@ const Importe = ({ usuario }) => {
         setAlerta({ visible: true, mensaje, tipo });
         setTimeout(() => {
             setAlerta({ visible: false, mensaje: "", tipo: "" });
-        }, 3000);
+        }, 10000); // Cambiado de 3000 a 5000 milisegundos (5 segundos)
     };
 
     const handleFechaInicioChange = (date) => {
@@ -108,19 +108,19 @@ const Importe = ({ usuario }) => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-    
+
         const id = document.getElementById("id").value;
         const prioridad = document.getElementById("prioridad").value;
         const duracion = document.getElementById("duracion").value;
         const escalado = document.getElementById("escalado").value;
-    
+
         if (!imagen || !fecha_inicio || !fecha_fin || !hora_inicio || !hora_fin || !id || !prioridad || !duracion || !escalado) {
             mostrarAlerta("Por favor completa todos los campos obligatorios.", "error");
             return;
         }
-    
+
         setLoading(true);
-    
+
         const formData = new FormData();
         formData.append("imagen", imagen);
         formData.append("fecha_inicio", fecha_inicio.toISOString().split('T')[0]);
@@ -131,29 +131,29 @@ const Importe = ({ usuario }) => {
         formData.append("prioridad", prioridad);
         formData.append("duracion", duracion);
         formData.append("escalado", escalado);
-    
+
         try {
             const response = await fetch("https://api.jaison.mx/raspi/api.php?action=subirimg", {
                 method: "POST",
                 body: formData,
             });
-    
+
             const responseText = await response.text();
             console.log("Respuesta del servidor:", responseText);
-    
+
             let data;
             try {
                 data = JSON.parse(responseText);
             } catch {
                 data = responseText;
             }
-    
+
             if (response.ok) {
                 mostrarAlerta("Archivo subido exitosamente.", "success");
             } else {
-                mostrarAlerta(`⚠️ Error en la subida: ${data?.message || responseText}`, "error");
+                mostrarAlerta(`Error en la subida: ${data?.message || responseText}`, "error");
             }
-    
+
             // Reset de los inputs después de enviar
             setImagen(null);
             setPreview(null);
@@ -165,14 +165,14 @@ const Importe = ({ usuario }) => {
             document.getElementById("prioridad").value = "";
             document.getElementById("duracion").value = "";
             document.getElementById("escalado").value = "";
-    
+
         } catch (error) {
             mostrarAlerta("Error de conexión. Intenta de nuevo.", "error");
         } finally {
             setLoading(false);
         }
     };
-    
+
 
     useEffect(() => { //Dispositivos
         const fetchDevices = async () => {
@@ -308,9 +308,9 @@ const Importe = ({ usuario }) => {
                                 </select>
                             </div>
 
-                            <div className="form-group">
+                            <div className="form-group" style={{ display: "none" }}>
                                 <label htmlFor="prioridad" className='fechafin'>Prioridad</label>
-                                <input className='custom-input' type="number" name="prioridad" id="prioridad" min="1" max="10" required />
+                                <input className='custom-input' type="hidden" name="prioridad" id="prioridad" min="1" max="10" defaultValue="0"/>
                             </div>
 
                             <div className="form-group">
