@@ -6,6 +6,15 @@ body {
     font-optical-sizing: auto;
     font-weight: weight;
     font-style: normal;
+    padding: 
+        env(safe-area-inset-top, 20px)   /* Para notch superior */
+        env(safe-area-inset-right, 20px) 
+        env(safe-area-inset-bottom, 20px) /* Para barra inferior en iPhone */
+        env(safe-area-inset-left, 20px) !important;
+    min-height: 100vh;
+}
+header {
+    padding-top: env(safe-area-inset-top, 20px) !important;
 }
 
 .tamaño-imagen {
@@ -265,7 +274,7 @@ input[type="time"].custom-input,
     height: 45px;
 }
 
-input[type="time"].custom-input2,
+input[type="time"].custom-input2, 
 #id2,
 #prioridad2,
 #device,

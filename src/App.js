@@ -14,15 +14,17 @@ function App() {
   useEffect(() => {
     const verificarSesion = async () => {
       try {
-        const response = await fetch('https://api.jaison.mx/Analisis_Perros/index.php?', {
-          credentials: 'include',
+        const response = await fetch('https://api.jaison.mx/Analisis_Perros/index.php?action=obtenerUsuarios', {
         });
 
-        const data = await response.json();
-        console.log("Respuesta del backend:", data);
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}`);
+        }
 
-        if (data.success) {
-          setUsuario(data);  
+        const data = await response.json();
+
+        if (data.success && data.usuario) {
+          setUsuario(data.usuario);
         } else {
           setUsuario(null);
         }
@@ -36,13 +38,13 @@ function App() {
   }, []);
 
   return (
-    <Router basename="/app1">
+    <Router basename="/">
       <Routes>
         <Route path="/" element={usuario ? <Home usuario={usuario} setUsuario={setUsuario} /> : <Login setUsuario={setUsuario} />} />
         <Route path="/MiPerfil" element={usuario ? <Perfil usuario={usuario} setUsuario={setUsuario} /> : <Login setUsuario={setUsuario} />} />
         <Route path="/Importar" element={usuario ? <Importe usuario={usuario} setUsuario={setUsuario} /> : <Login setUsuario={setUsuario} />} />
         <Route path="/Editar" element={usuario ? <Editar usuario={usuario} setUsuario={setUsuario} /> : <Login setUsuario={setUsuario} />} />
-      </Routes> 
+      </Routes>
     </Router>
   );
 }

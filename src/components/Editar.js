@@ -15,7 +15,7 @@ const Editar = ({ usuario }) => {
     const [selectedMedia, setSelectedMedia] = useState(null);
     const [editIndex, setEditIndex] = useState(null);
     const [escalados, setEscalados] = useState([]);
-    const [nombre, setNombre] = useState([]);
+    const [dispositivos, setDispositivos] = useState([]);
 
     // Estado para el formulario de edición
     const [formData, setFormData] = useState({
@@ -25,7 +25,7 @@ const Editar = ({ usuario }) => {
         hora_inicio: "00:00:00",
         hora_fin: "23:59:59",
         escalado: "",
-        device: "",
+        device_name: "", // Asegúrate de tener este campo para el nombre
         x: "",
         y: ""
     });
@@ -43,7 +43,7 @@ const Editar = ({ usuario }) => {
 
             if (response.ok) {
                 localStorage.removeItem("token");
-                window.location.href = "/app1";
+                window.location.href = "/";
             } else {
                 console.error("Error al cerrar sesión:", await response.text());
             }
@@ -79,6 +79,9 @@ const Editar = ({ usuario }) => {
             mediaData.thumbnail = await getVideoThumbnail(imagenSeleccionada.src);
         }
 
+        // Buscar el dispositivo correspondiente
+        const dispositivo = dispositivos.find(d => d.nombre === mediaData.device_name);
+
         // Actualizar estado del formulario
         setFormData({
             rule_id: mediaData.rule_id,
@@ -87,7 +90,8 @@ const Editar = ({ usuario }) => {
             hora_inicio: mediaData.hora_inicio,
             hora_fin: mediaData.hora_fin,
             escalado: mediaData.escalado,
-            nombre: mediaData.nombre,
+            device_id: dispositivo?.id || "",
+            device_name: mediaData.device_name || "",
             x: mediaData.x || "",
             y: mediaData.y || ""
         });
@@ -105,66 +109,91 @@ const Editar = ({ usuario }) => {
             hora_inicio: "00:00:00",
             hora_fin: "23:59:59",
             escalado: "",
-            nombre: "",
+            device_id: "",
+            device_name: "",
             x: "",
             y: ""
         });
     };
 
     // Manejador para guardar cambios
-    const handleSave = async () => {
-        try {
-            // 1. Validación básica
-            if (!formData.rule_id || !formData.fecha_inicio || !formData.fecha_fin) {
-                alert("Faltan campos obligatorios");
-                return;
-            }
+    // Manejador para guardar cambios - Versión corregida
+const handleSave = async () => {
+    try {
+        // Validación de campos requeridos
+        const requiredFields = {
+            'ID de regla': formData.rule_id,
+            'Fecha inicio': formData.fecha_inicio,
+            'Fecha fin': formData.fecha_fin,
+            'Escalado': formData.escalado,
+            'Dispositivo': formData.device_id,
+            'Coordenada X': formData.x,
+            'Coordenada Y': formData.y
+        };
 
-            // 2. Preparar payload
-            const payload = {
+        for (const [field, value] of Object.entries(requiredFields)) {
+            if (!value && value !== 0) {
+                throw new Error(`El campo ${field} es obligatorio`);
+            }
+        }
+
+        // Preparar datos para enviar
+        const formDataToSend = new FormData();
+        formDataToSend.append('fecha_inicio', formData.fecha_inicio);
+        formDataToSend.append('fecha_fin', formData.fecha_fin);
+        formDataToSend.append('hora_inicio', formData.hora_inicio);
+        formDataToSend.append('hora_fin', formData.hora_fin);
+        formDataToSend.append('escalado', formData.escalado);
+        formDataToSend.append('nombre', formData.device_id);
+        formDataToSend.append('x', formData.x);
+        formDataToSend.append('y', formData.y);
+
+        // Enviar al backend
+        const response = await fetch(
+            `https://api.jaison.mx/raspi/api.php?action=editarimg&id=${formData.rule_id}`,
+            {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                },
+                body: formDataToSend
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(await response.text());
+        }
+
+        const result = await response.json();
+        if (result.error) throw new Error(result.error);
+
+        // Actualizar el estado local con los nuevos datos
+        const dispositivoActualizado = dispositivos.find(d => d.id === formData.device_id);
+        
+        setImagenes(prev => prev.map((img, idx) => 
+            idx === editIndex ? {
+                ...img,
                 fecha_inicio: formData.fecha_inicio,
                 fecha_fin: formData.fecha_fin,
                 hora_inicio: formData.hora_inicio,
                 hora_fin: formData.hora_fin,
                 escalado: formData.escalado,
-                nombre: nombre.find(d => d.id === formData.nombre)?.nombre || "",
-                x: formData.x || null,
-                y: formData.y || null
-            };
+                device_id: formData.device_id,
+                device_name: dispositivoActualizado?.nombre || img.device_name,
+                x: formData.x,
+                y: formData.y
+            } : img
+        ));
 
-            // 3. Enviar a la API
-            const response = await fetch(
-                `https://api.jaison.mx/raspi/api.php?action=editarimg&id=${formData.rule_id}`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${localStorage.getItem("token")}`
-                    },
-                    body: JSON.stringify(payload) // <- Solo los datos sin el ID
-                }
-            );
+        // Cerrar edición y mostrar mensaje
+        handleCancelEdit();
+        alert(result.mensaje || "¡Cambios guardados correctamente!");
 
-            if (!response.ok) {
-                const errorData = await response.text(); // O response.json() si la API retorna JSON
-                throw new Error(errorData || "Error en la respuesta del servidor");
-            }
-
-            const result = await response.json();
-            console.log("Respuesta exitosa:", result);
-            alert("¡Cambios guardados!");
-
-        } catch (error) {
-            console.error("Error completo:", {
-                message: error.message,
-                stack: error.stack,
-                data: formData // Para ver qué se intentó enviar
-            });
-            alert(`Error al guardar: ${error.message}`);
-        }
-
-        
-    };
+    } catch (error) {
+        console.error("Error al guardar:", error);
+        alert(`Error: ${error.message}`);
+    }
+};
 
     // Manejador genérico para cambios en el formulario
     const handleInputChange = (e) => {
@@ -175,6 +204,16 @@ const Editar = ({ usuario }) => {
         }));
     };
 
+    // Manejador para cambios en dispositivos
+    const handleDeviceChange = (selectedDeviceId) => {
+        const dispositivoSeleccionado = dispositivos.find(d => d.id === selectedDeviceId);
+        setFormData(prev => ({
+            ...prev,
+            device_id: selectedDeviceId,
+            device_name: dispositivoSeleccionado?.nombre || ""
+        }));
+    };
+
     // Manejador para cambios en fechas
     const handleDateChange = (date, field) => {
         setFormData(prev => ({
@@ -182,56 +221,52 @@ const Editar = ({ usuario }) => {
             [field]: date.toISOString().split('T')[0]
         }));
     };
+    
 
     // Efectos para carga inicial de datos
     useEffect(() => {
         const fetchInitialData = async () => {
             try {
                 setLoading(true);
-
-                // Obtener imágenes
-                const imagesResponse = await fetch('https://api.jaison.mx/raspi/api.php?action=listarImagenes');
-                const imagesData = await imagesResponse.json();
-
-                if (imagesData && Array.isArray(imagesData.data)) {
+                
+                // Usando Promise.all para requests paralelos
+                const [imagesData, escaladosData, dispositivosData] = await Promise.all([
+                    fetch('https://api.jaison.mx/raspi/api.php?action=listarImagenes').then(res => res.json()),
+                    fetch('https://api.jaison.mx/raspi/api.php?action=obtenerescalados').then(res => res.json()),
+                    fetch("https://api.jaison.mx/raspi/api.php?action=obtenerdevices", {
+                        headers: {
+                            "Authorization": `Bearer ${localStorage.getItem("token")}`
+                        }
+                    }).then(res => res.json())
+                ]);
+        
+                // Procesar imágenes con thumbnails
+                if (imagesData?.data) {
                     const imagesWithThumbnails = await Promise.all(
-                        imagesData.data.map(async img => {
-                            if (img.src.endsWith('.mp4')) {
-                                const thumbnail = await getVideoThumbnail(img.src);
-                                return { ...img, thumbnail };
-                            }
-                            return img;
-                        })
+                        imagesData.data.map(async img => 
+                            img.src.endsWith('.mp4') 
+                                ? { ...img, thumbnail: await getVideoThumbnail(img.src) } 
+                                : img
+                        )
                     );
                     setImagenes(imagesWithThumbnails);
                 }
-
-                // Obtener escalados
-                const escaladosResponse = await fetch("https://api.jaison.mx/raspi/api.php?action=obtenerescalados");
-                const escaladosData = await escaladosResponse.json();
-                setEscalados(escaladosData);
-
-                // Obtener dispositivos
-                const nombresResponse = await fetch("https://api.jaison.mx/raspi/api.php?action=obtenerdevices", {
-                    mode: "cors",
-                });
-                const nombresData = await nombresResponse.json();
-                setNombre(nombresData);
-
+        
+                setEscalados(escaladosData || []);
+                setDispositivos(
+                    (dispositivosData || []).map(({ id, nombre }) => ({ id, nombre }))
+                );
+                
             } catch (error) {
-                console.error("Error al cargar datos iniciales:", error);
+                console.error("Error al cargar datos:", error);
+                // Opcional: Mostrar notificación al usuario
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchInitialData(); // Solo se ejecuta una vez al montar el componente
-
-        // Eliminar estas líneas que establecían el intervalo:
-        // const interval = setInterval(fetchInitialData, 5000);
-        // return () => clearInterval(interval);
-
-    }, []); // Asegúrate de que el array de dependencias esté vacío
+        fetchInitialData();
+    }, []);
 
     return (
         <div>
@@ -294,7 +329,7 @@ const Editar = ({ usuario }) => {
                                                             dateFormat='yyyy/MM/dd'
                                                             className='custom-input2'
                                                             locale='es'
-                                                            
+
                                                         />
                                                     </td>
                                                     <td>
@@ -304,49 +339,53 @@ const Editar = ({ usuario }) => {
                                                             dateFormat='yyyy/MM/dd'
                                                             className='custom-input2'
                                                             locale='es'
-                                                            
+
                                                             minDate={new Date(formData.fecha_inicio)}
                                                         />
                                                     </td>
                                                     <td>
                                                         <input
                                                             type='time'
-                                                            className='custom-input2'
+                                                            className='custom-input2 react-datepicker-ignore-onclickoutside'
                                                             name="hora_inicio"
                                                             value={formData.hora_inicio}
                                                             onChange={handleInputChange}
-                                                            
+
                                                             step="1"
                                                         />
                                                     </td>
                                                     <td>
                                                         <input
                                                             type='time'
-                                                            className='custom-input2'
+                                                            className='custom-input2 react-datepicker-ignore-onclickoutside'
                                                             name="hora_fin"
                                                             value={formData.hora_fin}
                                                             onChange={handleInputChange}
                                                             min={formData.hora_inicio}
-                                                            
+
                                                             step="1"
                                                         />
                                                     </td>
                                                     <td>
                                                         <input
                                                             type='number'
+                                                            id='prioridad'
                                                             className='custom-input2'
                                                             name="x"
                                                             value={formData.x}
                                                             onChange={handleInputChange}
+
                                                         />
                                                     </td>
                                                     <td>
                                                         <input
                                                             type='number'
                                                             className='custom-input2'
+                                                            id='prioridad'
                                                             name="y"
                                                             value={formData.y}
                                                             onChange={handleInputChange}
+
                                                         />
                                                     </td>
                                                     <td>
@@ -355,7 +394,7 @@ const Editar = ({ usuario }) => {
                                                             name="escalado"
                                                             value={formData.escalado}
                                                             onChange={handleInputChange}
-                                                            
+                                                            id='prioridad'
                                                         >
                                                             <option value="">Seleccione...</option>
                                                             {escalados.map((escalado, idx) => (
@@ -368,15 +407,15 @@ const Editar = ({ usuario }) => {
                                                     <td>
                                                         <select
                                                             className='custom-input2'
-                                                            name="nombre"
-                                                            value={formData.nombre}
-                                                            onChange={handleInputChange}
-                                                            
+                                                            id='prioridad'
+                                                            value={formData.device_id}
+                                                            onChange={(e) => handleDeviceChange(e.target.value)}
+                                                            required
                                                         >
-                                                            <option value="">Seleccione...</option>
-                                                            {nombre.map((nombre) => (
-                                                                <option key={nombre.id} value={nombre.id}>
-                                                                    {nombre.nombre}
+                                                            <option value="">Seleccione dispositivo...</option>
+                                                            {dispositivos.map(device => (
+                                                                <option key={device.id} value={device.id}>
+                                                                    {device.nombre}
                                                                 </option>
                                                             ))}
                                                         </select>
@@ -426,7 +465,6 @@ const Editar = ({ usuario }) => {
                     <Link className='btn btn-primary' to='/Importar'>Regresar</Link>
                 </div>
 
-                {/* Modal para vista previa de medios */}
                 {selectedMedia && (
                     <div className="modal" onClick={() => setSelectedMedia(null)}>
                         <div style={{ padding: "10px", borderRadius: "8px", position: "relative" }}>
@@ -454,6 +492,8 @@ const Editar = ({ usuario }) => {
                     </div>
                 )}
             </div>
+
+
         </div>
     );
 };

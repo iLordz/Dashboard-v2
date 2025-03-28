@@ -20,7 +20,7 @@ const Perfil = ({ usuario }) => {
     
             if (response.ok) {
                 localStorage.removeItem("token");
-                window.location.href = "/app1";
+                window.location.href = "/";
             } else {
                 console.error("Error al cerrar sesión:", data);
             }
