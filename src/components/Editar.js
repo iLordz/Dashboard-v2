@@ -16,6 +16,7 @@ const Editar = ({ usuario }) => {
     const [editIndex, setEditIndex] = useState(null);
     const [escalados, setEscalados] = useState([]);
     const [dispositivos, setDispositivos] = useState([]);
+    const [error, setError] = useState(null);
 
     // Estado para el formulario de edición
     const [formData, setFormData] = useState({
@@ -118,82 +119,82 @@ const Editar = ({ usuario }) => {
 
     // Manejador para guardar cambios
     // Manejador para guardar cambios - Versión corregida
-const handleSave = async () => {
-    try {
-        // Validación de campos requeridos
-        const requiredFields = {
-            'ID de regla': formData.rule_id,
-            'Fecha inicio': formData.fecha_inicio,
-            'Fecha fin': formData.fecha_fin,
-            'Escalado': formData.escalado,
-            'Dispositivo': formData.device_id,
-            'Coordenada X': formData.x,
-            'Coordenada Y': formData.y
-        };
+    const handleSave = async () => {
+        try {
+            // Validación de campos requeridos
+            const requiredFields = {
+                'ID de regla': formData.rule_id,
+                'Fecha inicio': formData.fecha_inicio,
+                'Fecha fin': formData.fecha_fin,
+                'Escalado': formData.escalado,
+                'Dispositivo': formData.device_id,
+                'Coordenada X': formData.x,
+                'Coordenada Y': formData.y
+            };
 
-        for (const [field, value] of Object.entries(requiredFields)) {
-            if (!value && value !== 0) {
-                throw new Error(`El campo ${field} es obligatorio`);
+            for (const [field, value] of Object.entries(requiredFields)) {
+                if (!value && value !== 0) {
+                    throw new Error(`El campo ${field} es obligatorio`);
+                }
             }
-        }
 
-        // Preparar datos para enviar
-        const formDataToSend = new FormData();
-        formDataToSend.append('fecha_inicio', formData.fecha_inicio);
-        formDataToSend.append('fecha_fin', formData.fecha_fin);
-        formDataToSend.append('hora_inicio', formData.hora_inicio);
-        formDataToSend.append('hora_fin', formData.hora_fin);
-        formDataToSend.append('escalado', formData.escalado);
-        formDataToSend.append('nombre', formData.device_id);
-        formDataToSend.append('x', formData.x);
-        formDataToSend.append('y', formData.y);
+            // Preparar datos para enviar
+            const formDataToSend = new FormData();
+            formDataToSend.append('fecha_inicio', formData.fecha_inicio);
+            formDataToSend.append('fecha_fin', formData.fecha_fin);
+            formDataToSend.append('hora_inicio', formData.hora_inicio);
+            formDataToSend.append('hora_fin', formData.hora_fin);
+            formDataToSend.append('escalado', formData.escalado);
+            formDataToSend.append('nombre', formData.device_id);
+            formDataToSend.append('x', formData.x);
+            formDataToSend.append('y', formData.y);
 
-        // Enviar al backend
-        const response = await fetch(
-            `https://api.jaison.mx/raspi/api.php?action=editarimg&id=${formData.rule_id}`,
-            {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`
-                },
-                body: formDataToSend
+            // Enviar al backend
+            const response = await fetch(
+                `https://api.jaison.mx/raspi/api.php?action=editarimg&id=${formData.rule_id}`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`
+                    },
+                    body: formDataToSend
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(await response.text());
             }
-        );
 
-        if (!response.ok) {
-            throw new Error(await response.text());
+            const result = await response.json();
+            if (result.error) throw new Error(result.error);
+
+            // Actualizar el estado local con los nuevos datos
+            const dispositivoActualizado = dispositivos.find(d => d.id === formData.device_id);
+
+            setImagenes(prev => prev.map((img, idx) =>
+                idx === editIndex ? {
+                    ...img,
+                    fecha_inicio: formData.fecha_inicio,
+                    fecha_fin: formData.fecha_fin,
+                    hora_inicio: formData.hora_inicio,
+                    hora_fin: formData.hora_fin,
+                    escalado: formData.escalado,
+                    device_id: formData.device_id,
+                    device_name: dispositivoActualizado?.nombre || img.device_name,
+                    x: formData.x,
+                    y: formData.y
+                } : img
+            ));
+
+            // Cerrar edición y mostrar mensaje
+            handleCancelEdit();
+            alert(result.mensaje || "¡Cambios guardados correctamente!");
+
+        } catch (error) {
+            console.error("Error al guardar:", error);
+            alert(`Error: ${error.message}`);
         }
-
-        const result = await response.json();
-        if (result.error) throw new Error(result.error);
-
-        // Actualizar el estado local con los nuevos datos
-        const dispositivoActualizado = dispositivos.find(d => d.id === formData.device_id);
-        
-        setImagenes(prev => prev.map((img, idx) => 
-            idx === editIndex ? {
-                ...img,
-                fecha_inicio: formData.fecha_inicio,
-                fecha_fin: formData.fecha_fin,
-                hora_inicio: formData.hora_inicio,
-                hora_fin: formData.hora_fin,
-                escalado: formData.escalado,
-                device_id: formData.device_id,
-                device_name: dispositivoActualizado?.nombre || img.device_name,
-                x: formData.x,
-                y: formData.y
-            } : img
-        ));
-
-        // Cerrar edición y mostrar mensaje
-        handleCancelEdit();
-        alert(result.mensaje || "¡Cambios guardados correctamente!");
-
-    } catch (error) {
-        console.error("Error al guardar:", error);
-        alert(`Error: ${error.message}`);
-    }
-};
+    };
 
     // Manejador genérico para cambios en el formulario
     const handleInputChange = (e) => {
@@ -221,66 +222,111 @@ const handleSave = async () => {
             [field]: date.toISOString().split('T')[0]
         }));
     };
-    
+
+    const LoadingSpinner = () => (
+        <div className="text-center mt-5">
+            <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Cargando...</span>
+            </div>
+            <p>Cargando datos...</p>
+        </div>
+    );
+
+    const ErrorMessage = ({ error, onRetry }) => (
+        <div className="alert alert-danger mt-5 container">
+            {error}
+            <button className="btn btn-secondary ms-3" onClick={onRetry}>
+                Reintentar
+            </button>
+        </div>
+    );
+
 
     // Efectos para carga inicial de datos
     useEffect(() => {
         const fetchInitialData = async () => {
             try {
                 setLoading(true);
-                
-                // Usando Promise.all para requests paralelos
-                const [imagesData, escaladosData, dispositivosData] = await Promise.all([
-                    fetch('https://api.jaison.mx/raspi/api.php?action=listarImagenes').then(res => res.json()),
-                    fetch('https://api.jaison.mx/raspi/api.php?action=obtenerescalados').then(res => res.json()),
-                    fetch("https://api.jaison.mx/raspi/api.php?action=obtenerdevices", {
-                        headers: {
-                            "Authorization": `Bearer ${localStorage.getItem("token")}`
-                        }
-                    }).then(res => res.json())
+                setError(null);
+    
+                // Realizar todas las peticiones en paralelo
+                const [imagesResponse, escaladosResponse, dispositivosResponse] = await Promise.all([
+                    fetch('https://api.jaison.mx/raspi/api.php?action=listarImagenes'),
+                    fetch('https://api.jaison.mx/raspi/api.php?action=obtenerescalados'),
+                    fetch("https://api.jaison.mx/raspi/api.php?action=obtenerdevices")
                 ]);
-        
-                // Procesar imágenes con thumbnails
-                if (imagesData?.data) {
-                    const imagesWithThumbnails = await Promise.all(
-                        imagesData.data.map(async img => 
-                            img.src.endsWith('.mp4') 
-                                ? { ...img, thumbnail: await getVideoThumbnail(img.src) } 
-                                : img
-                        )
-                    );
-                    setImagenes(imagesWithThumbnails);
+    
+                // Verificar si las respuestas de las APIs son exitosas
+                if (!imagesResponse.ok) throw new Error(`Error al cargar imágenes: ${imagesResponse.status}`);
+                if (!escaladosResponse.ok) throw new Error(`Error al cargar escalados: ${escaladosResponse.status}`);
+                if (!dispositivosResponse.ok) throw new Error(`Error al cargar dispositivos: ${dispositivosResponse.status}`);
+    
+                // Parsear las respuestas JSON
+                const [imagesData, escaladosData, dispositivosData] = await Promise.all([
+                    imagesResponse.json(),
+                    escaladosResponse.json(),
+                    dispositivosResponse.json()
+                ]);
+    
+                // Verificar el formato de los datos de las imágenes
+                if (!imagesData.data || !Array.isArray(imagesData.data)) {
+                    throw new Error("Formato de datos de imágenes inválido");
                 }
-        
-                setEscalados(escaladosData || []);
-                setDispositivos(
-                    (dispositivosData || []).map(({ id, nombre }) => ({ id, nombre }))
+    
+                // Agregar las miniaturas a las imágenes con extensión .mp4
+                const imagesWithThumbnails = await Promise.all(
+                    imagesData.data.map(async img => {
+                        if (img.src && img.src.endsWith('.mp4')) {
+                            try {
+                                const thumbnail = await getVideoThumbnail(img.src);
+                                return { ...img, thumbnail };
+                            } catch (e) {
+                                console.error("Error generando thumbnail:", e);
+                                return img;
+                            }
+                        }
+                        return img;
+                    })
                 );
-                
+    
+                // Guardar los datos en el estado
+                setImagenes(imagesWithThumbnails);
+                setEscalados(escaladosData || []);
+                setDispositivos((dispositivosData || []).map(({ id, nombre }) => ({ id, nombre })));
+    
             } catch (error) {
+                // Mostrar el error si algo falla
                 console.error("Error al cargar datos:", error);
-                // Opcional: Mostrar notificación al usuario
+                setError(`Error al cargar datos: ${error.message}`);
+                setImagenes([]); // Limpiar las imágenes en caso de error
             } finally {
-                setLoading(false);
+                setLoading(false); // Finalizar la carga
             }
         };
-
-        fetchInitialData();
-    }, []);
+    
+        fetchInitialData(); // Llamada inicial
+    }, []); // Solo ejecutarse una vez al montar el componente
+    
 
     return (
+        
         <div>
             <Navbar usuario={usuario} handleLogout={handleLogout} />
             <h1 className='container'>Listado</h1>
             <hr />
             <div className='container'>
-                <Link className="btn btn-primary" to='/Editar'>Añadir</Link>
+                <Link className="btn btn-primary" to='/Importar'>Añadir</Link>
             </div>
             <hr />
-            <div className='container-fluid px-3'>
-                {loading ? (
-                    <p className='text-center'>Cargando...</p>
-                ) : (
+            {loading ? (
+                <LoadingSpinner />
+            ) : error ? (
+                <ErrorMessage
+                    error={error}
+                    onRetry={() => window.location.reload()}
+                />
+            ) : (
+                <div className='container-fluid px-3'>
                     <div className='table-responsive'>
                         <table className='table table-striped table-hover text-center'>
                             <thead className='table-dark'>
@@ -459,41 +505,39 @@ const handleSave = async () => {
                             </tbody>
                         </table>
                     </div>
-                )}
 
-                <div className='d-flex justify-content-center mt-3'>
-                    <Link className='btn btn-primary' to='/Importar'>Regresar</Link>
-                </div>
-
-                {selectedMedia && (
-                    <div className="modal" onClick={() => setSelectedMedia(null)}>
-                        <div style={{ padding: "10px", borderRadius: "8px", position: "relative" }}>
-                            <button
-                                onClick={() => setSelectedMedia(null)}
-                                className="btn btn-danger position-absolute top-0 end-0 m-2"
-                            >
-                                ✖
-                            </button>
-                            {selectedMedia.type === "image" ? (
-                                <img
-                                    src={selectedMedia.src}
-                                    alt="Vista previa"
-                                    style={{ maxWidth: "90vw", maxHeight: "90vh" }}
-                                />
-                            ) : (
-                                <video
-                                    src={selectedMedia.src}
-                                    controls
-                                    style={{ maxWidth: "90vw", maxHeight: "90vh" }}
-                                    autoPlay
-                                />
-                            )}
-                        </div>
+                    <div className='d-flex justify-content-center mt-3'>
+                        <Link className='btn btn-primary' to='/Importar'>Regresar</Link>
                     </div>
-                )}
-            </div>
 
-
+                    {selectedMedia && (
+                        <div className="modal" onClick={() => setSelectedMedia(null)}>
+                            <div style={{ padding: "10px", borderRadius: "8px", position: "relative" }}>
+                                <button
+                                    onClick={() => setSelectedMedia(null)}
+                                    className="btn btn-danger position-absolute top-0 end-0 m-2"
+                                >
+                                    ✖
+                                </button>
+                                {selectedMedia.type === "image" ? (
+                                    <img
+                                        src={selectedMedia.src}
+                                        alt="Vista previa"
+                                        style={{ maxWidth: "90vw", maxHeight: "90vh" }}
+                                    />
+                                ) : (
+                                    <video
+                                        src={selectedMedia.src}
+                                        controls
+                                        style={{ maxWidth: "90vw", maxHeight: "90vh" }}
+                                        autoPlay
+                                    />
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 };

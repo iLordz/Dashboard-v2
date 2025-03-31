@@ -225,6 +225,8 @@ const Importe = ({ usuario }) => {
     return (
         <div>
             <Navbar usuario={usuario} handleLogout={handleLogout} />
+            <h1 className='container'>Importar archivo</h1>
+            <hr />
             {/* <button onClick={handleTestModal} className="test-btn">Probar Modal</button> */}
             {loading && (
                 <div className="modal">
@@ -244,7 +246,10 @@ const Importe = ({ usuario }) => {
 
                 <div className={`upload-area ${dragging ? 'dragging' : ''}`}
                     onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
-                    <h3 className="upload-text">Puedes arrastrar y soltar una imagen o video, o seleccionarlo desde tu dispositivo.</h3>
+                    <h3 className="upload-text">Puedes arrastrar y soltar una imagen o video, o seleccionarlo desde tu dispositivo.<span className="tooltip-container">
+                        <span className="container info-icon">?</span>
+                        <span className="container tooltip-text">Asegúrate de que tu archivo sea JPG, PNG o WEBP para imágenes, y MP4 o MOV para videos.</span>
+                    </span></h3>
                     <form onSubmit={handleSubmit}>
                         <label htmlFor="imageUpload" className="upload-btn" x>Seleccionar archivo</label>
                         <br />
@@ -310,7 +315,7 @@ const Importe = ({ usuario }) => {
 
                             <div className="form-group" style={{ display: "none" }}>
                                 <label htmlFor="prioridad" className='fechafin'>Prioridad</label>
-                                <input className='custom-input' type="hidden" name="prioridad" id="prioridad" min="1" max="10" defaultValue="0"/>
+                                <input className='custom-input' type="hidden" name="prioridad" id="prioridad" min="1" max="10" defaultValue="0" />
                             </div>
 
                             <div className="form-group">
