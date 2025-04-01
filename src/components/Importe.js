@@ -329,7 +329,7 @@ const Importe = ({ usuario }) => {
                             <div className="form-group">
                                 <label className="fechafin">Elige un dispositivo</label>
                                 <select className="custom-input" name="id" id="id" required>
-                                    <option value="" disabled>Selecciona un dispositivo</option>
+                                    <option value="" disabled selected>Selecciona un dispositivo</option>
                                     {devices.length > 0 ? (
                                         devices.map((device) => (
                                             <option key={device.id} value={device.id}>{device.nombre}</option>
