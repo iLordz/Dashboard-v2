@@ -1,34 +1,36 @@
 @import "~@fortawesome/fontawesome-free/css/all.min.css";
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
 
+
 .container {
     height: 100%;
 }
+
 body {
     font-family: "DM Sans", sans-serif;
     font-optical-sizing: auto;
     font-weight: weight;
     font-style: normal;
-    padding: 
-        env(safe-area-inset-top, 20px)   /* Para notch superior */
-        env(safe-area-inset-right, 20px) 
-        env(safe-area-inset-bottom, 20px) /* Para barra inferior en iPhone */
-        env(safe-area-inset-left, 20px) !important;
-    min-height: 100vh;
+    margin: 0;
 }
+
 header {
     padding-top: env(safe-area-inset-top, 20px) !important;
 }
-h1{
+
+h1 {
     padding-top: 8px;
 }
-p{
+
+p {
     margin-top: none !important;
     margin-bottom: 10px !important;
 }
-.mt-4{
+
+.mt-4 {
     margin-top: 10px !important;
 }
+
 .tooltip-container {
     position: relative;
     display: inline-block;
@@ -39,33 +41,62 @@ p{
     background-color: #007bff;
     color: white;
     border-radius: 50%;
-    padding: 3px 8px;
-    font-size: 14px;
+    padding: 5px 10px;
+    font-size: 16px;
     font-weight: bold;
-    margin-left: 5px;
+    display: flex;
+    justify-content: center;
     align-items: center;
+    width: 20px;
+    height: 20px;
 }
 
 .tooltip-text {
     visibility: hidden;
-    width: 50%;
+    width: max-content;
+    max-width: 300px;
+    /* Evita que el tooltip sea demasiado ancho */
     background-color: black;
     color: #fff;
     text-align: center;
     border-radius: 6px;
-    padding: 5px;
+    padding: 8px;
     position: absolute;
-    z-index: 1;
+    z-index: 10;
     top: 120%;
     left: 50%;
     transform: translateX(-50%);
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: opacity 0.3s, transform 0.3s;
+    font-size: 14px;
+    line-height: 1.4;
 }
-.tooltip-container:hover .tooltip-text {
+
+.tooltip-container:hover .tooltip-text,
+.tooltip-container.show-tooltip .tooltip-text {
     visibility: visible;
     opacity: 1;
+    transform: translateX(-50%) translateY(0);
 }
+
+/* Responsivo para móviles */
+@media (max-width: 480px) {
+    .info-icon {
+        width: 18px;
+        height: 18px;
+        font-size: 14px;
+        padding: 4px 8px;
+    }
+
+    .tooltip-text {
+        max-width: 100px;
+        /* Usa un porcentaje menor si el texto sigue saliéndose */
+        font-size: 10px;
+        text-align: center;
+        /* Alinea el texto para mejorar la legibilidad */
+    }
+}
+
 
 
 .tamaño-imagen {
@@ -88,8 +119,11 @@ p{
 
 /* Estilo del encabezado*/
 .navbar {
+    width: 100%;
     background-color: #003ba7 !important;
     color: white;
+
+
 }
 
 .icon {
@@ -252,6 +286,18 @@ hr {
     color: #444;
 }
 
+@media (max-width: 480px) {
+
+    .fechainicio,
+    .fechafin {
+        font-size: 12px;
+    }
+
+    .custom-input {
+        height: 50%;
+    }
+}
+
 .fechainicio input,
 .fechafin input {
     font-size: 16px;
@@ -276,18 +322,18 @@ hr {
 }
 
 .custom-input {
-    font-size: 15px;
-    border: 2px solid #ccc;
-    border-radius: 10px;
-    outline: none;
-    background-color: white;
-    color: #333;
+    font-size: 15px !important;
+    border: 2px solid #ccc !important;
+    border-radius: 10px !important;
+    outline: none !important;
+    color: #333 !important;
     cursor: pointer;
     transition: border-color 0.3s ease-in-out;
     text-align: center;
-    width: 100%;
-    box-sizing: border-box;
+    width: 100% !important;
+    box-sizing: border-box !important;
 }
+
 .custom-input2 {
     font-size: 15px;
     border: 2px solid #ccc;
@@ -297,7 +343,7 @@ hr {
     color: #333;
     cursor: pointer;
     transition: border-color 0.3s ease-in-out;
-    
+
     width: 100%;
     box-sizing: border-box;
 }
@@ -309,7 +355,7 @@ select.custom-input option {
 }
 
 .mt-5 {
-    margin-top: 0rem !important; 
+    margin-top: 0rem !important;
 }
 
 input[type="time"].custom-input,
@@ -323,9 +369,11 @@ input[type="time"].custom-input,
     border-radius: 5px;
     background-color: #ffffff00;
     height: 45px;
+    width: 100% !important;
+    align-items: center;
 }
 
-input[type="time"].custom-input2, 
+input[type="time"].custom-input2,
 #id2,
 #prioridad2,
 #device,
@@ -549,7 +597,7 @@ ul {
     align-items: center;
     z-index: 1000;
     cursor: pointer;
-}   
+}
 
 .modal-content {
     background-color: white;
@@ -615,16 +663,16 @@ img {
 
 
 .custom-navbar-toggler {
-    border: none; 
-    padding: 10px; 
-    border-radius: 5px; 
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
     align-items: center;
 }
 
 
 .user-icon {
     padding: 5px;
-    color: white; 
+    color: white;
 }
 
 .img-thumbnail {

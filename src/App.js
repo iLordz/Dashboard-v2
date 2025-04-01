@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Perfil from './components/Perfil';
 import Importe from './components/Importe';
 import Editar from './components/Editar';
+import ScrollToTop from './components/ScrollToTop';
 
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
 
   return (
     <Router basename="/">
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={usuario ? <Home usuario={usuario} setUsuario={setUsuario} /> : <Login setUsuario={setUsuario} />} />
         <Route path="/MiPerfil" element={usuario ? <Perfil usuario={usuario} setUsuario={setUsuario} /> : <Login setUsuario={setUsuario} />} />

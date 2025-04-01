@@ -1,7 +1,7 @@
 /* eslint-disable no-template-curly-in-string */
 /* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from './Navbar';
 import "react-datepicker/dist/react-datepicker.css";
@@ -222,6 +222,26 @@ const Importe = ({ usuario }) => {
         fetchEscalados();
     }, []);
 
+    const [isTooltipVisible, setIsTooltipVisible] = useState(false);
+    const tooltipRef = useRef(null);
+
+    const toggleTooltip = () => {
+        setIsTooltipVisible(!isTooltipVisible);
+    };
+
+    const handleClickOutside = (event) => {
+        if (tooltipRef.current && !tooltipRef.current.contains(event.target)) {
+            setIsTooltipVisible(false);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener("click", handleClickOutside);
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
+    }, []);
+
     return (
         <div>
             <Navbar usuario={usuario} handleLogout={handleLogout} />
@@ -246,10 +266,17 @@ const Importe = ({ usuario }) => {
 
                 <div className={`upload-area ${dragging ? 'dragging' : ''}`}
                     onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
-                    <h3 className="upload-text">Puedes arrastrar y soltar una imagen o video, o seleccionarlo desde tu dispositivo.<span className="tooltip-container">
-                        <span className="container info-icon">?</span>
-                        <span className="container tooltip-text">Asegúrate de que tu archivo sea JPG, PNG o WEBP para imágenes, y MP4 o MOV para videos.</span>
-                    </span></h3>
+                    <h3 className="upload-text">Puedes arrastrar y soltar una imagen o video, o seleccionarlo desde tu dispositivo.
+                        <span className="tooltip-container" ref={tooltipRef}>
+                            <span className="info-icon" onClick={toggleTooltip}>?</span>
+                            {isTooltipVisible && (
+                                <span className="tooltip-text">
+                                    Asegúrate de que tu archivo sea JPG, PNG o WEBP para imágenes, y MP4 o MOV para videos.
+                                </span>
+                            )}
+                        </span>
+
+                    </h3>
                     <form onSubmit={handleSubmit}>
                         <label htmlFor="imageUpload" className="upload-btn" x>Seleccionar archivo</label>
                         <br />
@@ -319,7 +346,7 @@ const Importe = ({ usuario }) => {
                             </div>
 
                             <div className="form-group">
-                                <label className="escalado-label">Elige un escalado</label>
+                                <label className="fechafin">Elige un escalado</label>
                                 <select className="custom-input" name="escalado" id="escalado" required>
                                     <option value="" disabled selected>Selecciona un escalado</option>
                                     {loading ? (
