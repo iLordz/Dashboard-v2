@@ -394,7 +394,7 @@ input[type="time"].custom-input2,
 
 
 .react-datepicker__input-container input {
-    background-color: #f7f7f7 !important;
+    background-color: #f7f7f700 !important;
     padding: 10px !important;
     border-radius: 5px !important;
 }
