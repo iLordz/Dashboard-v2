@@ -464,6 +464,7 @@ const Editar = ({ usuario }) => {
                     <div className='d-flex justify-content-center mt-3'>
                         <Link className='btn btn-primary' to='/Importar'>Regresar</Link>
                     </div>
+                    <br />
 
                     {selectedMedia && (
                         <div className="modal" onClick={() => setSelectedMedia(null)}>

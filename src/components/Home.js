@@ -2,7 +2,8 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Graficas from './Graphs';
+// import Graficas from './Graphs';
+import Graficas2 from './Graphs2';
 import Navbar from './Navbar';
 
 const Home = ({ usuario }) => {
@@ -41,7 +42,8 @@ const Home = ({ usuario }) => {
                 {usuario ? <p>¡Hola, <strong>{usuario.usuario}!</strong> Bienvenido </p> : <p>Inicia sesión para continuar.</p>}
             </div>
             <hr />
-            <Graficas className='container' />
+            {/* <Graficas className='container' /> */}
+            <Graficas2 className='container' />
             <br />
             <hr />
             <br />
