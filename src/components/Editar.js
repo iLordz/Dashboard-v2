@@ -460,8 +460,8 @@ const Editar = ({ usuario }) => {
                             </tbody>
                         </table>
                     </div>
-
-                    <div className='d-flex justify-content-center mt-3'>
+                    <hr />      
+                    <div className='container'>
                         <Link className='btn btn-primary' to='/Importar'>Regresar</Link>
                     </div>
                     <br />

@@ -247,6 +247,10 @@ const Importe = ({ usuario }) => {
             <Navbar usuario={usuario} handleLogout={handleLogout} />
             <h1 className='container'>Importar archivo</h1>
             <hr />
+            <div className="container">
+                <Link className="btn btn-primary" to='/Editar'>Editar</Link>
+            </div>
+            <hr />
             {/* <button onClick={handleTestModal} className="test-btn">Probar Modal</button> */}
             {loading && (
                 <div className="modal">
@@ -256,6 +260,7 @@ const Importe = ({ usuario }) => {
                     </div>
                 </div>
             )}
+
 
             <div className='container'>
                 {alerta.visible && (
@@ -384,14 +389,14 @@ const Importe = ({ usuario }) => {
                         <button type="submit" className="upload-btn">Subir</button>
                     </form>
                 </div>
-
-                <div className="button-container">
-                    <Link className="btn btn-primary" to='/'>Regresar</Link>
-                    <Link className="btn btn-primary" to='/Editar'>Editar</Link>
-                </div>
-                <br />
             </div>
+            <hr />    
+            <div className="container">
+                <Link className="btn btn-primary" to='/'>Regresar</Link>
+            </div>
+            <br />
         </div>
+
     );
 };
 

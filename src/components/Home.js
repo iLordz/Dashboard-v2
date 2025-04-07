@@ -42,14 +42,14 @@ const Home = ({ usuario }) => {
                 {usuario ? <p>¡Hola, <strong>{usuario.usuario}!</strong> Bienvenido </p> : <p>Inicia sesión para continuar.</p>}
             </div>
             <hr />
+            <div className='container'>
+                <Link className="btn btn-primary" to="/Importar">Importar imagen</Link>
+            </div>
+            <hr />
             {/* <Graficas className='container' /> */}
             <Graficas2 className='container' />
             <br />
             <hr />
-            <br />
-            <div className='container'>
-                <Link className="btn btn-primary" to="/Importar">Importar imagen</Link>
-            </div>
             <br />
         </div>
     );
