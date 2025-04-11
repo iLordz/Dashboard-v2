@@ -6,7 +6,7 @@ import Icon from '../images/icon.png';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 
-const Navbar = ({ usuario, handleLogout }) => {
+const Navbar = ({ usuario, setUsuario, cerrarSesion }) => {
     const location = useLocation(); // Obtiene la ruta actual
 
 
@@ -37,7 +37,7 @@ const Navbar = ({ usuario, handleLogout }) => {
                                         </li>
                                     )}
                                     <li>
-                                        <button className="dropdown-item" onClick={handleLogout}>
+                                        <button className="dropdown-item" onClick={cerrarSesion}>
                                             <i className="fas fa-sign-out-alt mi-dropdown-item-icon"></i> Cerrar sesión
                                         </button>
                                     </li>

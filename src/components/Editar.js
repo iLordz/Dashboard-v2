@@ -9,31 +9,31 @@ import { es } from 'date-fns/locale';
 registerLocale('es', es);
 setDefaultLocale('es');
 
-const Editar = ({ usuario }) => {
+const Editar = ({ usuario, cerrarSesion }) => {
 
-    const handleLogout = async () => {
-        try {
-            const response = await fetch("https://api.jaison.mx/Analisis_Perros/index.php?action=logout", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}` // Si usas tokens
-                }
-            });
+    // const handleLogout = async () => {
+    //     try {
+    //         const response = await fetch("https://api.jaison.mx/Analisis_Perros/index.php?action=logout", {
+    //             method: "POST",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //                 Authorization: `Bearer ${localStorage.getItem("token")}` // Si usas tokens
+    //             }
+    //         });
 
-            const data = await response.text();
-            console.log("Respuesta del servidor:", data);
+    //         const data = await response.text();
+    //         console.log("Respuesta del servidor:", data);
 
-            if (response.ok) {
-                localStorage.removeItem("token");
-                window.location.href = "/";
-            } else {
-                console.error("Error al cerrar sesión:", data);
-            }
-        } catch (error) {
-            console.error("Error de red:", error);
-        }
-    };
+    //         if (response.ok) {
+    //             localStorage.removeItem("token");
+    //             window.location.href = "/";
+    //         } else {
+    //             console.error("Error al cerrar sesión:", data);
+    //         }
+    //     } catch (error) {
+    //         console.error("Error de red:", error);
+    //     }
+    // };
 
     const LoadingSpinner = () => (
         <div className="text-center mt-5">
@@ -80,36 +80,36 @@ const Editar = ({ usuario }) => {
         try {
             setLoading(true);
             setError(null);
-    
+
             // Restauramos la versión original que funcionaba con handleSave
             const response = await fetch('https://api.jaison.mx/raspi/api.php?action=listarImagenes');
             const data = await response.json();
-    
+
             if (!response.ok) {
                 throw new Error(data.message || "Error al cargar imágenes");
             }
-    
+
             // Procesamiento para mostrar imágenes (solo la parte visual)
             const imagenesProcesadas = data.data.map(img => ({
                 ...img,
                 src: img.src.startsWith('http') ? img.src : `https://api.jaison.mx/${img.src}`
             }));
-    
+
             // Obtenemos escalados y dispositivos (esto puede mantenerse igual)
             const [escaladosRes, dispositivosRes] = await Promise.all([
                 fetch('https://api.jaison.mx/raspi/api.php?action=obtenerescalados'),
                 fetch("https://api.jaison.mx/raspi/api.php?action=obtenerdevices")
             ]);
-    
+
             const [escaladosData, dispositivosData] = await Promise.all([
                 escaladosRes.json(),
                 dispositivosRes.json()
             ]);
-    
+
             setImagenes(imagenesProcesadas);
             setEscalados(escaladosData || []);
             setDispositivos(dispositivosData || []);
-    
+
         } catch (error) {
             console.error("Error al cargar datos:", error);
             setError("Error al cargar datos. Intenta recargar la página.");
@@ -125,7 +125,7 @@ const Editar = ({ usuario }) => {
     // Manejador para editar registro (ORIGINAL)
     const handleEdit = async (index) => {
         const imagenSeleccionada = imagenes[index];
-        
+
         // Buscar el dispositivo correspondiente
         const dispositivo = dispositivos.find(d => d.nombre === imagenSeleccionada.device_name);
 
@@ -158,13 +158,13 @@ const Editar = ({ usuario }) => {
                 'Coordenada X': formData.x,
                 'Coordenada Y': formData.y
             };
-    
+
             for (const [field, value] of Object.entries(requiredFields)) {
                 if (!value && value !== 0) {
                     throw new Error(`El campo ${field} es obligatorio`);
                 }
             }
-    
+
             // Crear URLSearchParams para enviar los datos
             const params = new URLSearchParams();
             params.append('fecha_inicio', formData.fecha_inicio);
@@ -175,11 +175,11 @@ const Editar = ({ usuario }) => {
             params.append('nombre', formData.device_id);
             params.append('x', formData.x);
             params.append('y', formData.y);
-    
+
             // URL completa para debugging
             const url = `https://api.jaison.mx/raspi/api.php?action=editarimg&id=${formData.rule_id}`;
             console.log("URL de la petición:", url);
-    
+
             const response = await fetch(url, {
                 method: "POST",
                 headers: {
@@ -187,20 +187,20 @@ const Editar = ({ usuario }) => {
                 },
                 body: params.toString()
             });
-    
+
             if (!response.ok) {
                 const errorText = await response.text();
                 throw new Error(errorText || "Error en la respuesta del servidor");
             }
-    
+
             const result = await response.json();
             if (result.error) {
                 throw new Error(result.error);
             }
-    
+
             // Actualizar el estado local
             const dispositivoActualizado = dispositivos.find(d => d.id === formData.device_id);
-            
+
             setImagenes(prev => prev.map((img, idx) =>
                 idx === editIndex ? {
                     ...img,
@@ -215,11 +215,11 @@ const Editar = ({ usuario }) => {
                     y: formData.y
                 } : img
             ));
-    
+
             // Cerrar edición y mostrar mensaje
             handleCancelEdit();
             alert(result.mensaje || "¡Cambios guardados correctamente!");
-    
+
         } catch (error) {
             console.error("Error completo al guardar:", error);
             alert(`Error al guardar: ${error.message}`);
@@ -271,7 +271,7 @@ const Editar = ({ usuario }) => {
     return (
 
         <div>
-            <Navbar usuario={usuario} handleLogout={handleLogout} />
+            <Navbar usuario={usuario} cerrarSesion={cerrarSesion} />
             <h1 className='container'>Listado</h1>
             <hr />
             <div className='container'>
@@ -422,12 +422,14 @@ const Editar = ({ usuario }) => {
                                                         </select>
                                                     </td>
                                                     <td>
-                                                        <button className='btn btn-success me-2' onClick={handleSave}>
-                                                            Guardar
-                                                        </button>
-                                                        <button className='btn btn-danger' onClick={handleCancelEdit}>
-                                                            Cancelar
-                                                        </button>
+                                                        <div className="custom-btn-group">
+                                                            <button className="btn btn-success" onClick={handleSave}>
+                                                                Guardar
+                                                            </button>
+                                                            <button className="btn btn-danger" onClick={handleCancelEdit}>
+                                                                Cancelar
+                                                            </button>
+                                                        </div>
                                                     </td>
                                                 </>
                                             ) : (
@@ -441,10 +443,7 @@ const Editar = ({ usuario }) => {
                                                     <td>{imagen.escalado}</td>
                                                     <td>{imagen.device_name}</td>
                                                     <td>
-                                                        <button
-                                                            onClick={() => handleEdit(index)}
-                                                            className='btn btn-secondary'
-                                                        >
+                                                        <button onClick={() => handleEdit(index)} className='btn btn-secondary' style={{ alignItems: 'center' }} >
                                                             Editar
                                                         </button>
                                                     </td>
@@ -460,7 +459,7 @@ const Editar = ({ usuario }) => {
                             </tbody>
                         </table>
                     </div>
-                    <hr />      
+                    <hr />
                     <div className='container'>
                         <Link className='btn btn-primary' to='/Importar'>Regresar</Link>
                     </div>
@@ -468,7 +467,7 @@ const Editar = ({ usuario }) => {
 
                     {selectedMedia && (
                         <div className="modal" onClick={() => setSelectedMedia(null)}>
-                            <div style={{ padding: "10px", borderRadius: "8px", position: "relative" }}>
+                            <div style={{ padding: "8px", borderRadius: "10px", position: "relative" }}>
                                 <button
                                     onClick={() => setSelectedMedia(null)}
                                     className="btn btn-danger position-absolute top-0 end-0 m-2"

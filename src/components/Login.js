@@ -70,6 +70,7 @@ const Login = ({ setUsuario }) => {
                 const data = await response.json();
 
                 if (data.success) {
+                    localStorage.setItem('token', data.token_sesion);
                     setUsuario({ correo, usuario: data.usuario });
                     navigate('/');
                 } else {

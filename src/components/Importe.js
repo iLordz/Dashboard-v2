@@ -12,30 +12,30 @@ import { es } from 'date-fns/locale';
 registerLocale('es', es);
 setDefaultLocale('es');
 
-const Importe = ({ usuario }) => {
-    const handleLogout = async () => {
-        try {
-            const response = await fetch("https://api.jaison.mx/Analisis_Perros/index.php?action=logout", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}` // Si usas tokens
-                }
-            });
+const Importe = ({ usuario, cerrarSesion }) => {
+    // const handleLogout = async () => {
+    //     try {
+    //         const response = await fetch("https://api.jaison.mx/Analisis_Perros/index.php?action=logout", {
+    //             method: "POST",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //                 Authorization: `Bearer ${localStorage.getItem("token")}` // Si usas tokens
+    //             }
+    //         });
 
-            const data = await response.text();
-            console.log("Respuesta del servidor:", data);
+    //         const data = await response.text();
+    //         console.log("Respuesta del servidor:", data);
 
-            if (response.ok) {
-                localStorage.removeItem("token");
-                window.location.href = "/";
-            } else {
-                console.error("Error al cerrar sesión:", data);
-            }
-        } catch (error) {
-            console.error("Error de red:", error);
-        }
-    };
+    //         if (response.ok) {
+    //             localStorage.removeItem("token");
+    //             window.location.href = "/";
+    //         } else {
+    //             console.error("Error al cerrar sesión:", data);
+    //         }
+    //     } catch (error) {
+    //         console.error("Error de red:", error);
+    //     }
+    // };
 
     const [imagen, setImagen] = useState(null);
     const [preview, setPreview] = useState(null);
@@ -244,7 +244,7 @@ const Importe = ({ usuario }) => {
 
     return (
         <div>
-            <Navbar usuario={usuario} handleLogout={handleLogout} />
+            <Navbar usuario={usuario} cerrarSesion={cerrarSesion} />
             <h1 className='container'>Importar archivo</h1>
             <hr />
             <div className="container">
@@ -271,7 +271,7 @@ const Importe = ({ usuario }) => {
 
                 <div className={`upload-area ${dragging ? 'dragging' : ''}`}
                     onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
-                    <h3 className="upload-text">Puedes arrastrar y soltar una imagen o video, o seleccionarlo desde tu dispositivo.
+                    <h3 className="upload-text">Puedes arrastrar y soltar una imagen o video, o seleccionarlo desde tu dispositivo. 
                         <span className="tooltip-container" ref={tooltipRef}>
                             <span className="info-icon" onClick={toggleTooltip}>?</span>
                             {isTooltipVisible && (
@@ -289,8 +289,8 @@ const Importe = ({ usuario }) => {
                         {imagen && <p className="file-name">Archivo seleccionado: {imagen.name}</p>}
 
                         {preview && (
-                            <div className="preview-container">
-                                <button className="delete-btn" onClick={() => {
+                            <div style={{ padding: "8px", borderRadius: "10px", position: "relative" }} className="preview-container">
+                                <button  className="btn btn-danger position-absolute top-0 end-0 m-2" onClick={() => {
                                     setImagen(null);
                                     setPreview(null);
                                 }}>✖</button>

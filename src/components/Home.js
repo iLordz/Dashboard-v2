@@ -3,39 +3,41 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 // import Graficas from './Graphs';
-import Graficas2 from './Graphs2';
+// import Graficas2 from './Graphs2';
+import Graficas3 from './Graphs3';
 import Navbar from './Navbar';
 
-const Home = ({ usuario }) => {
-    const handleLogout = async () => {
-        try {
-            const response = await fetch("https://api.jaison.mx/Analisis_Perros/index.php?action=logout", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}` // Si usas tokens
-                }
-            });
 
-            const data = await response.text();
-            console.log("Respuesta del servidor:", data);
+const Home = ({ usuario, cerrarSesion  }) => {
+    // const handleLogout = async () => {
+    //     try {
+    //         const response = await fetch("https://api.jaison.mx/Analisis_Perros/index.php?action=logout", {
+    //             method: "POST",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //                 Authorization: `Bearer ${localStorage.getItem("token")}` // Si usas tokens
+    //             }
+    //         });
 
-            if (response.ok) {
-                localStorage.removeItem("token");
-                window.location.href = "/";
-            } else {
-                console.error("Error al cerrar sesión:", data);
-            }
-        } catch (error) {
-            console.error("Error de red:", error);
-        }
-    };
+    //         const data = await response.text();
+    //         console.log("Respuesta del servidor:", data);
+
+    //         if (response.ok) {
+    //             localStorage.removeItem("token");
+    //             window.location.href = "/";
+    //         } else {
+    //             console.error("Error al cerrar sesión:", data);
+    //         }
+    //     } catch (error) {
+    //         console.error("Error de red:", error);
+    //     }
+    // };
 
 
 
     return (
         <div>
-            <Navbar usuario={usuario} handleLogout={handleLogout} />
+            <Navbar usuario={usuario} cerrarSesion={cerrarSesion} />
 
             {/* Contenido principal */}
             <div className="container mt-4">
@@ -43,11 +45,14 @@ const Home = ({ usuario }) => {
             </div>
             <hr />
             <div className='container'>
-                <Link className="btn btn-primary" to="/Importar">Importar imagen</Link>
+                <Link className="btn btn-primary me-2" to="/Importar">Importar imagen</Link>
+                <Link className="btn btn-primary" to='/Editar'>Editar</Link>
             </div>
             <hr />
+            {/* <Excel className='container' /> */}
             {/* <Graficas className='container' /> */}
-            <Graficas2 className='container' />
+            {/* <Graficas2 className='container' /> */}
+            <Graficas3 className='container' />
             <br />
             <hr />
             <br />

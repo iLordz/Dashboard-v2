@@ -4,38 +4,39 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from './Navbar';
 
-const Perfil = ({ usuario }) => {
-    const handleLogout = async () => {
-        try {
-            const response = await fetch("https://api.jaison.mx/Analisis_Perros/index.php?action=logout", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}` // Si usas tokens
-                }
-            });
+const Perfil = ({ usuario, cerrarSesion }) => {
+    // const handleLogout = async () => {
+    //     try {
+    //         const response = await fetch("https://api.jaison.mx/Analisis_Perros/index.php?action=logout", {
+    //             method: "POST",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //                 Authorization: `Bearer ${localStorage.getItem("token")}` // Si usas tokens
+    //             }
+    //         });
     
-            const data = await response.text();
-            console.log("Respuesta del servidor:", data);
+    //         const data = await response.text();
+    //         console.log("Respuesta del servidor:", data);
     
-            if (response.ok) {
-                localStorage.removeItem("token");
-                window.location.href = "/";
-            } else {
-                console.error("Error al cerrar sesión:", data);
-            }
-        } catch (error) {
-            console.error("Error de red:", error);
-        }
-    };
+    //         if (response.ok) {
+    //             localStorage.removeItem("token");
+    //             window.location.href = "/";
+    //         } else {
+    //             console.error("Error al cerrar sesión:", data);
+    //         }
+    //     } catch (error) {
+    //         console.error("Error de red:", error);
+    //     }
+    // };
 
 
     return (
         <div>
-            <Navbar usuario={usuario} handleLogout={handleLogout} />
+            <Navbar usuario={usuario} cerrarSesion={cerrarSesion} />
+            <br /   >
 
             <div className="container mt-5 p-4 shadow-sm rounded bg-light">
-                <h1 className="perfil-usuario">Configurarción</h1>
+                <h1 className="perfil-usuario">Configuración</h1>
                 <h2 className=''>Perfíl</h2>
                 <hr></hr>
                 <form className="mt-3">
