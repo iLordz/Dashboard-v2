@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import Navbar from './Navbar';
 import { Link } from 'react-router-dom';
 import "react-datepicker/dist/react-datepicker.css";
-import DatePicker from 'react-datepicker';
 import { registerLocale, setDefaultLocale } from 'react-datepicker';
 import { es } from 'date-fns/locale';
 
@@ -60,6 +59,21 @@ const Editar = ({ usuario, cerrarSesion }) => {
     const [escalados, setEscalados] = useState([]);
     const [dispositivos, setDispositivos] = useState([]);
     const [error, setError] = useState(null);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+
+    const handleRefresh = async () => {
+        try {
+            setIsRefreshing(true);
+            await fetchData(); // Reutilizamos la función existente
+        } catch (error) {
+            console.error("Error al actualizar:", error);
+            alert("Error al actualizar los datos");
+        } finally {
+            setIsRefreshing(false);
+        }
+    };
+
 
     // Estado para el formulario de edición
     const [formData, setFormData] = useState({
@@ -145,7 +159,6 @@ const Editar = ({ usuario, cerrarSesion }) => {
         setEditIndex(index);
     };
 
-    // Manejador para guardar cambios (TU VERSIÓN ORIGINAL QUE FUNCIONABA)
     const handleSave = async () => {
         try {
             // Validación de campos requeridos
@@ -218,7 +231,8 @@ const Editar = ({ usuario, cerrarSesion }) => {
 
             // Cerrar edición y mostrar mensaje
             handleCancelEdit();
-            alert(result.mensaje || "¡Cambios guardados correctamente!");
+            console.log("Respuesta del servidor:", result);
+            alert(result.mensaje || "Cambios guardados correctamente");
 
         } catch (error) {
             console.error("Error completo al guardar:", error);
@@ -260,12 +274,14 @@ const Editar = ({ usuario, cerrarSesion }) => {
         }));
     };
 
-    const handleDateChange = (date, field) => {
+    const handleDateChange = (dateValue, field) => {
         setFormData(prev => ({
             ...prev,
-            [field]: date.toISOString().split('T')[0]
+            [field]: dateValue // El input type="date" ya devuelve el formato YYYY-MM-DD
         }));
     };
+
+
 
 
     return (
@@ -275,7 +291,19 @@ const Editar = ({ usuario, cerrarSesion }) => {
             <h1 className='container'>Listado</h1>
             <hr />
             <div className='container'>
-                <Link className="btn btn-primary" to='/Importar'>Añadir</Link>
+                <Link className="btn btn-primary me-2" to='/Importar'>Añadir</Link>
+                <button className="btn btn-primary" onClick={handleRefresh} disabled={isRefreshing}>
+                    {isRefreshing ? (
+                        <>
+                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Actualizando...
+                        </>
+                    ) : (
+                        <>
+                            <i className="bi bi-arrow-clockwise"></i> Actualizar
+                        </>
+                    )}
+                </button>
             </div>
             <hr />
             {loading ? (
@@ -329,24 +357,20 @@ const Editar = ({ usuario, cerrarSesion }) => {
                                             {editIndex === index ? (
                                                 <>
                                                     <td>
-                                                        <DatePicker
-                                                            selected={formData.fecha_inicio ? new Date(formData.fecha_inicio) : null}
-                                                            onChange={(date) => handleDateChange(date, 'fecha_inicio')}
-                                                            dateFormat='yyyy/MM/dd'
-                                                            className='custom-input2'
-                                                            locale='es'
-
+                                                        <input
+                                                            type="date"
+                                                            className="custom-input2"
+                                                            value={formData.fecha_inicio || ""}
+                                                            onChange={(e) => handleDateChange(e.target.value, 'fecha_inicio')}
                                                         />
                                                     </td>
                                                     <td>
-                                                        <DatePicker
-                                                            selected={formData.fecha_fin ? new Date(formData.fecha_fin) : null}
-                                                            onChange={(date) => handleDateChange(date, 'fecha_fin')}
-                                                            dateFormat='yyyy/MM/dd'
-                                                            className='custom-input2'
-                                                            locale='es'
-
-                                                            minDate={new Date(formData.fecha_inicio)}
+                                                        <input
+                                                            type="date"
+                                                            className="custom-input2"
+                                                            value={formData.fecha_fin || ""}
+                                                            onChange={(e) => handleDateChange(e.target.value, 'fecha_fin')}
+                                                            min={formData.fecha_inicio} // Validación para que fecha fin no sea anterior a fecha inicio
                                                         />
                                                     </td>
                                                     <td>

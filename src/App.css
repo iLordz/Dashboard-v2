@@ -400,7 +400,17 @@ input[type="time"].custom-input2,
     background-color: #ffffff00;
     height: 45px;
 }
-
+input[type="date"].custom-input2,
+#id2,
+#prioridad2,
+#device,
+#imageSize {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    background-color: #ffffff00;
+    height: 45px;
+}
 .form-group {
     display: flex;
     flex-direction: column;
