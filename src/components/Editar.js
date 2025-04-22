@@ -4,11 +4,12 @@ import { Link } from 'react-router-dom';
 import "react-datepicker/dist/react-datepicker.css";
 import { registerLocale, setDefaultLocale } from 'react-datepicker';
 import { es } from 'date-fns/locale';
+import axios from 'axios';
 
 registerLocale('es', es);
 setDefaultLocale('es');
 
-const Editar = ({ usuario, cerrarSesion }) => {
+const Editar = ({ usuario, cerrarSesion, rule_id }) => {
 
     // const handleLogout = async () => {
     //     try {
@@ -157,6 +158,30 @@ const Editar = ({ usuario, cerrarSesion }) => {
         });
 
         setEditIndex(index);
+    };
+
+    const eliminarImagen = async (rule_id) => {
+        if (!window.confirm('¿Estás seguro de que deseas eliminar esta imagen?')) {
+            return;
+        }
+    
+        try {
+            const response = await axios.post(
+                `https://api.jaison.mx/raspi/api.php?action=eliminarimg&id=${rule_id}`
+            );
+            
+            if (response.data.error) {
+                throw new Error(response.data.error);
+            }
+    
+            // Actualizar el estado eliminando la imagen del array
+            setImagenes(prev => prev.filter(img => img.rule_id !== rule_id));
+            
+            alert('Imagen eliminada correctamente.');
+        } catch (error) {
+            console.error('Error al eliminar:', error);
+            alert(`Error al eliminar la imagen: ${error.message}`);
+        }
     };
 
     const handleSave = async () => {
@@ -450,7 +475,10 @@ const Editar = ({ usuario, cerrarSesion }) => {
                                                             <button className="btn btn-success" onClick={handleSave}>
                                                                 Guardar
                                                             </button>
-                                                            <button className="btn btn-danger" onClick={handleCancelEdit}>
+                                                            <button className="btn btn-danger" onClick={() => eliminarImagen(formData.rule_id)}>
+                                                                Eliminar
+                                                            </button>
+                                                            <button className="btn btn-secondary" onClick={handleCancelEdit}>
                                                                 Cancelar
                                                             </button>
                                                         </div>
@@ -502,13 +530,13 @@ const Editar = ({ usuario, cerrarSesion }) => {
                                     <img
                                         src={selectedMedia.src}
                                         alt="Vista previa"
-                                        style={{ maxWidth: "90vw", maxHeight: "90vh" }}
+                                        style={{ maxWidth: "90vw", maxHeight: "90vh", borderTopRightRadius: "10px" }}
                                     />
                                 ) : (
                                     <video
                                         src={selectedMedia.src}
                                         controls
-                                        style={{ maxWidth: "90vw", maxHeight: "90vh" }}
+                                        style={{ maxWidth: "90vw", maxHeight: "90vh", borderTopRightRadius: "10px" }}
                                         autoPlay
                                     />
                                 )}

@@ -21,3 +21,9 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Archivos de entorno
+.env                # General (backup)
+.env.development    # Desarrollo frontend
+.env.production     # Producción frontend
+.env.backend        # Si usas variables en el backend (opcional)
